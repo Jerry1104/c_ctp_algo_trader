@@ -81,6 +81,14 @@ void TdSpi::ReqSettlementInfoConfirm()
 	memset(&req, 0, sizeof(req));
 	strcpy(req.BrokerID, jy.BROKER_ID);
 	strcpy(req.InvestorID, jy.INVESTOR_ID);
+	/*
+	strcpy(req.ConfirmDate, pUserApi->GetTradingDay());
+	strcpy(req.ConfirmTime, pUserApi->GetTradingDay());
+	strcpy(req.AccountID, jy.UserID);
+	strcpy(req.CurrencyID, jy.UserID);*/
+	
+
+
 	int iResult = pUserApi->ReqSettlementInfoConfirm(&req, ++iRequestID);
 	cerr << "--->>> 投资者结算结果确认: " << ((iResult == 0) ? "成功" : "失败") << endl;
 }
