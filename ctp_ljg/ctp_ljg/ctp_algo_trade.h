@@ -26,7 +26,6 @@ private slots:
     void ReceiveHY(QString);
 
 
-
 private:
     Ui::ctp_algo_tradeClass ui;
   
