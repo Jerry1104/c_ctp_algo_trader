@@ -1,0 +1,362 @@
+#include "ctp_algo_trade.h"
+#include "ThostFtdcMdApi.h"
+#include "ThostFtdcTraderApi.h"
+#include "MdSpi.h"
+#include "TdSpi.h"
+
+ctp_algo_trade::ctp_algo_trade(QWidget* parent)
+    : QMainWindow(parent)
+{
+    ui.setupUi(this);
+
+    md = new MdSpi(this);
+    td = new TdSpi(this);
+
+
+    connect(md, SIGNAL(sendData(QString)), this, SLOT(ReceiveHQ(QString)));
+    connect(td, SIGNAL(sendCJ(QString)), this, SLOT(ReceiveCJ(QString)));
+    connect(td, SIGNAL(sendWT(QString)), this, SLOT(ReceiveWT(QString)));
+    connect(td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveCC(QString)));
+    connect(td, SIGNAL(sendHY(QString)), this, SLOT(ReceiveHY(QString)));
+
+    /**
+    行情表
+    **/
+    ui.HQTable->setColumnCount(11);
+
+    QStringList hqaderHQ;
+    hqaderHQ.append(QString::fromLocal8Bit("合约代码"));
+    hqaderHQ.append(QString::fromLocal8Bit("更新时间"));
+    hqaderHQ.append(QString::fromLocal8Bit("最新价"));
+    hqaderHQ.append(QString::fromLocal8Bit("买一价"));
+    hqaderHQ.append(QString::fromLocal8Bit("买一量"));
+    hqaderHQ.append(QString::fromLocal8Bit("卖一价"));
+    hqaderHQ.append(QString::fromLocal8Bit("卖一量"));
+    hqaderHQ.append(QString::fromLocal8Bit("涨幅"));
+    hqaderHQ.append(QString::fromLocal8Bit("成交量"));
+    hqaderHQ.append(QString::fromLocal8Bit("涨停价"));
+    hqaderHQ.append(QString::fromLocal8Bit("跌停价"));
+
+    ui.HQTable->setHorizontalHeaderLabels(hqaderHQ);//添加表格
+    ui.HQTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); //自动调整行宽大小
+    ui.HQTable->setSelectionBehavior(QAbstractItemView::SelectRows);//选中行
+    ui.HQTable->setEditTriggers(QAbstractItemView::NoEditTriggers); //不可编辑
+
+
+
+    /**委托表  **/
+    ui.WTTable->setColumnCount(9);
+
+    QStringList hqaderWT;
+    hqaderWT.append(QString::fromLocal8Bit("委托时间"));
+    hqaderWT.append(QString::fromLocal8Bit("合约代码"));
+    hqaderWT.append(QString::fromLocal8Bit("买卖"));
+    hqaderWT.append(QString::fromLocal8Bit("开平"));
+    hqaderWT.append(QString::fromLocal8Bit("数量"));
+    hqaderWT.append(QString::fromLocal8Bit("价格"));
+    hqaderWT.append(QString::fromLocal8Bit("状态"));
+    hqaderWT.append(QString::fromLocal8Bit("委托号"));
+    hqaderWT.append(QString::fromLocal8Bit("交易所"));
+    //填充表格信息
+    ui.WTTable->setHorizontalHeaderLabels(hqaderWT);
+    ui.WTTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui.WTTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui.WTTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+
+    /**成交表  **/
+    ui.CJTable->setColumnCount(8);
+
+    QStringList hqaderCJ;
+    hqaderCJ.append(QString::fromLocal8Bit("成交时间"));
+    hqaderCJ.append(QString::fromLocal8Bit("合约代码"));
+    hqaderCJ.append(QString::fromLocal8Bit("买卖"));
+    hqaderCJ.append(QString::fromLocal8Bit("开平"));
+    hqaderCJ.append(QString::fromLocal8Bit("数量"));
+    hqaderCJ.append(QString::fromLocal8Bit("价格"));
+    hqaderCJ.append(QString::fromLocal8Bit("委托号"));
+    hqaderCJ.append(QString::fromLocal8Bit("交易所"));
+
+    ui.CJTable->setHorizontalHeaderLabels(hqaderCJ);
+    ui.CJTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui.CJTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui.CJTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+
+
+    /**资金表  **/
+    ui.ZJTable->setColumnCount(5);
+    ui.ZJTable->setRowCount(2);
+
+    QStringList hqaderZJ;
+    hqaderZJ.append(QString::fromLocal8Bit("账号"));
+    hqaderZJ.append(QString::fromLocal8Bit("总权益"));
+    hqaderZJ.append(QString::fromLocal8Bit("占用保证金"));
+    hqaderZJ.append(QString::fromLocal8Bit("可用保证金"));
+    hqaderZJ.append(QString::fromLocal8Bit("风险度"));
+
+    ui.ZJTable->setHorizontalHeaderLabels(hqaderZJ);
+    ui.ZJTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui.ZJTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui.ZJTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+
+    /**持仓表  **/
+    ui.CCTable->setColumnCount(4);
+    ui.CCTable->setRowCount(6);
+
+    QStringList hqaderCC;
+    hqaderCC.append(QString::fromLocal8Bit("合约代码"));
+    hqaderCC.append(QString::fromLocal8Bit("持仓类型"));
+    hqaderCC.append(QString::fromLocal8Bit("持仓数量"));
+    hqaderCC.append(QString::fromLocal8Bit("持仓成本"));
+
+    ui.CCTable->setHorizontalHeaderLabels(hqaderCC);
+    ui.CCTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui.CCTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui.CCTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+
+
+    /**合约  **/
+    ui.HYTable->setColumnCount(4);
+
+    QStringList hqaderHY;
+    hqaderHY.append(QString::fromLocal8Bit("合约代码"));
+    hqaderHY.append(QString::fromLocal8Bit("合约名称"));
+    hqaderHY.append(QString::fromLocal8Bit("合约乘数"));
+    hqaderHY.append(QString::fromLocal8Bit("合约点数"));
+
+    ui.HYTable->setHorizontalHeaderLabels(hqaderHY);
+    ui.HYTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui.HYTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui.HYTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    
+
+
+
+
+    ui.MDEdit->setText("tcp://180.168.146.187:10111");
+    ui.TDEdit->setText("tcp://180.168.146.187:10101");
+    ui.BIDEdit->setText("9999");
+    ui.UserEdit->setText("049252");
+    ui.PWEdit->setEchoMode(QLineEdit::Password);
+    ui.PWEdit->setText("5201314tang");
+    ui.AuthCodeEdit->setText("0000000000000000");
+    ui.AppIDEdit->setText("simnow_client_test");
+    ui.radioSJ->setChecked(true);
+    ui.radioPJ->setChecked(true);
+}
+
+void ctp_algo_trade::MDLogin()
+{
+    //从EditLine传过来的参数为QString数据类型，在CTP API中为char数据类型，需做如下转化 
+    char* ch1;
+    char* ch2;
+    char* ch3;
+    char* ch4;
+    char* ch5;
+    char* ch6;
+    char* ch7;
+    QByteArray ba1 = ui.MDEdit->text().toLatin1();
+    QByteArray ba3 = ui.TDEdit->text().toLatin1();
+    QByteArray ba2 = ui.BIDEdit->text().toLatin1();
+    QByteArray ba4 = ui.UserEdit->text().toLatin1();
+    QByteArray ba5 = ui.PWEdit->text().toLatin1();
+    QByteArray ba6 = ui.AuthCodeEdit->text().toLatin1();
+    QByteArray ba7 = ui.AppIDEdit->text().toLatin1();
+    ch1 = ba1.data();
+    ch2 = ba2.data();
+    ch3 = ba3.data();
+    ch4 = ba4.data();
+    ch5 = ba5.data();
+    ch6 = ba6.data();
+    ch7 = ba7.data();
+
+    //行情登录
+    strcpy(md->hq.FRONT_ADDR, ch1);
+    strcpy(md->hq.BROKER_ID, ch2);
+    strcpy(md->hq.UserID, ch4);
+    strcpy(md->hq.PASSWORD, ch5);
+    strcpy(md->hq.AuthCode, ch6);
+    strcpy(md->hq.AppID, ch7);
+    md->Init();
+
+
+    //交易登陆
+    strcpy(td->jy.FRONT_ADDR, ch3);
+    strcpy(td->jy.BROKER_ID, ch2);
+    strcpy(td->jy.UserID, ch4);
+    strcpy(td->jy.PASSWORD, ch5);
+    strcpy(td->jy.AuthCode, ch6);
+    strcpy(td->jy.AppID, ch7);
+    td->Init();
+
+
+
+}
+
+//接收行情
+void ctp_algo_trade::ReceiveHQ(QString TICK)
+{
+    QStringList  strlist = TICK.split(",");	   //接收StringList数据
+    //循环传入的数据
+    for (int i = 0; i < ui.HQTable->rowCount(); i++)   //以 HQTable数量为边界
+    {
+        if (ui.HQTable->item(i, 0)->text() == strlist.at(0))
+        {
+            ui.HQTable->setItem(i, 0, new QTableWidgetItem(strlist.at(0)));	  //更新数据
+            ui.HQTable->setItem(i, 1, new QTableWidgetItem(strlist.at(1)));	  //更新数据 
+            ui.HQTable->setItem(i, 2, new QTableWidgetItem(strlist.at(2)));	  //更新数据
+            ui.HQTable->setItem(i, 3, new QTableWidgetItem(strlist.at(3)));	  //更新数据
+            ui.HQTable->setItem(i, 4, new QTableWidgetItem(strlist.at(4)));	  //更新数据
+            ui.HQTable->setItem(i, 5, new QTableWidgetItem(strlist.at(5)));	  //更新数据
+            ui.HQTable->setItem(i, 6, new QTableWidgetItem(strlist.at(6)));	  //更新数据
+            ui.HQTable->setItem(i, 7, new QTableWidgetItem(strlist.at(7)));	  //更新数据
+            ui.HQTable->setItem(i, 8, new QTableWidgetItem(strlist.at(8)));	  //更新数据
+            ui.HQTable->setItem(i, 9, new QTableWidgetItem(strlist.at(9)));	  //更新数据
+            ui.HQTable->setItem(i, 10, new QTableWidgetItem(strlist.at(10)));	  //更新数据
+            return;
+        }
+    }
+    int row = ui.HQTable->rowCount();
+    ui.HQTable->insertRow(row);
+    ui.HQTable->setItem(row, 0, new QTableWidgetItem(strlist.at(0)));
+    ui.HQTable->setItem(row, 1, new QTableWidgetItem(strlist.at(1)));
+    ui.HQTable->setItem(row, 2, new QTableWidgetItem(strlist.at(2)));
+    ui.HQTable->setItem(row, 3, new QTableWidgetItem(strlist.at(3)));
+    ui.HQTable->setItem(row, 4, new QTableWidgetItem(strlist.at(4)));
+    ui.HQTable->setItem(row, 5, new QTableWidgetItem(strlist.at(5)));
+    ui.HQTable->setItem(row, 6, new QTableWidgetItem(strlist.at(6)));
+    ui.HQTable->setItem(row, 7, new QTableWidgetItem(strlist.at(7)));
+    ui.HQTable->setItem(row, 8, new QTableWidgetItem(strlist.at(8)));
+    ui.HQTable->setItem(row, 9, new QTableWidgetItem(strlist.at(9)));
+    ui.HQTable->setItem(row, 10, new QTableWidgetItem(strlist.at(10)));
+}
+
+
+void ctp_algo_trade::ReceiveCJ(QString CJData)
+{
+
+    QStringList strlist = CJData.split(",");
+
+    QString buysell = "";
+    QString openclose = "";
+    if (strlist.at(2) == "0")
+    {
+        buysell = QString::fromLocal8Bit("买入");
+    }
+    else
+    {
+        buysell = QString::fromLocal8Bit("卖出");
+    }
+    if (strlist.at(3) == "0")
+    {
+        openclose = QString::fromLocal8Bit("开仓");
+    }
+    else if (strlist.at(3) == "4")
+    {
+        openclose = QString::fromLocal8Bit("平昨");
+    }
+    else if (strlist.at(3) == "3")
+    {
+        openclose = QString::fromLocal8Bit("平今");
+    }
+    //0是开仓,3是平今，4是平昨
+    int row = ui.CJTable->rowCount();
+    ui.CJTable->insertRow(row);
+    ui.CJTable->setItem(row, 0, new QTableWidgetItem(strlist.at(0)));
+    ui.CJTable->setItem(row, 1, new QTableWidgetItem(strlist.at(1)));
+    ui.CJTable->setItem(row, 2, new QTableWidgetItem(buysell));
+    ui.CJTable->setItem(row, 3, new QTableWidgetItem(openclose));
+    ui.CJTable->setItem(row, 4, new QTableWidgetItem(strlist.at(4)));
+    ui.CJTable->setItem(row, 5, new QTableWidgetItem(strlist.at(5)));
+    ui.CJTable->setItem(row, 6, new QTableWidgetItem(strlist.at(6)));
+    ui.CJTable->setItem(row, 7, new QTableWidgetItem(strlist.at(7)));
+
+
+}
+
+void ctp_algo_trade::ReceiveWT(QString WTData)
+{
+    QStringList strlist = WTData.split(",");
+    if (strlist.at(8) == "")return;
+
+    QString buysell = "";
+    QString openclose = "";
+    if (strlist.at(2) == "0")
+    {
+        buysell = QString::fromLocal8Bit("买入");
+    }
+    else
+    {
+        buysell = QString::fromLocal8Bit("卖出");
+    }
+    if (strlist.at(3) == "0")
+    {
+        openclose = QString::fromLocal8Bit("开仓");
+    }
+    else if (strlist.at(3) == "4")
+    {
+        openclose = QString::fromLocal8Bit("平昨");
+    }
+    else
+    {
+        openclose = QString::fromLocal8Bit("平今");
+    }
+    //0是开仓,3是平今，4是平昨
+    //循环传入的数据
+    for (int i = 0; i < ui.WTTable->rowCount(); i++)   //以 WTTable数量为边界
+    {
+        if (ui.WTTable->item(i, 0)->text() == strlist.at(0))
+        {
+            ui.WTTable->setItem(i, 0, new QTableWidgetItem(strlist.at(0)));	  //更新数据
+            ui.WTTable->setItem(i, 1, new QTableWidgetItem(strlist.at(1)));	  //更新数据
+            ui.WTTable->setItem(i, 2, new QTableWidgetItem(buysell));	  //更新数据
+            ui.WTTable->setItem(i, 3, new QTableWidgetItem(openclose));	  //更新数据
+            ui.WTTable->setItem(i, 4, new QTableWidgetItem(strlist.at(4)));	  //更新数据
+            ui.WTTable->setItem(i, 5, new QTableWidgetItem(strlist.at(6)));	  //更新数据
+            ui.WTTable->setItem(i, 6, new QTableWidgetItem(strlist.at(7)));	  //更新数据
+            ui.WTTable->setItem(i, 7, new QTableWidgetItem(strlist.at(8)));	  //更新数据
+            ui.WTTable->setItem(i, 8, new QTableWidgetItem(strlist.at(9)));	  //更新数据
+            return;
+        }
+    }
+    int row = ui.WTTable->rowCount();
+    ui.WTTable->insertRow(row);
+    ui.WTTable->setItem(row, 0, new QTableWidgetItem(strlist.at(0)));
+    ui.WTTable->setItem(row, 1, new QTableWidgetItem(strlist.at(1)));
+    ui.WTTable->setItem(row, 2, new QTableWidgetItem(buysell));
+    ui.WTTable->setItem(row, 3, new QTableWidgetItem(openclose));
+    ui.WTTable->setItem(row, 4, new QTableWidgetItem(strlist.at(4)));
+    ui.WTTable->setItem(row, 5, new QTableWidgetItem(strlist.at(6)));
+    ui.WTTable->setItem(row, 6, new QTableWidgetItem(strlist.at(7)));
+    ui.WTTable->setItem(row, 7, new QTableWidgetItem(strlist.at(8)));
+    ui.WTTable->setItem(row, 8, new QTableWidgetItem(strlist.at(9)));
+}
+
+
+void ctp_algo_trade::ReceiveCC(QString CCData)
+{
+
+}
+
+
+void ctp_algo_trade::ReceiveZJ(QString ZJData)
+{
+
+}
+
+
+
+void ctp_algo_trade::ReceiveHY(QString HYData)
+{
+    QStringList  strlist = HYData.split(",");	   //接收StringList数据
+//循环传入的数据
+    int row = ui.HYTable->rowCount();
+    ui.HYTable->insertRow(row);
+    ui.HYTable->setItem(row, 0, new QTableWidgetItem(strlist.at(0)));
+    ui.HYTable->setItem(row, 1, new QTableWidgetItem(strlist.at(1)));
+    ui.HYTable->setItem(row, 2, new QTableWidgetItem(strlist.at(2)));
+    ui.HYTable->setItem(row, 3, new QTableWidgetItem(strlist.at(3)));
+}
