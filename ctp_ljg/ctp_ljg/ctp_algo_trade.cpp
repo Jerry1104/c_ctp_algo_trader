@@ -139,9 +139,9 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     ui.MDEdit->setText("tcp://180.168.146.187:10111");
     ui.TDEdit->setText("tcp://180.168.146.187:10101");
     ui.BIDEdit->setText("9999");
-    ui.UserEdit->setText("049252");
+    ui.UserEdit->setText("137829");
     ui.PWEdit->setEchoMode(QLineEdit::Password);
-    ui.PWEdit->setText("5201314tang");
+    ui.PWEdit->setText("");
     ui.AuthCodeEdit->setText("0000000000000000");
     ui.AppIDEdit->setText("simnow_client_test");
     ui.radioSJ->setChecked(true);

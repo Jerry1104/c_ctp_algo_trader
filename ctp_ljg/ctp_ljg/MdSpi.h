@@ -11,6 +11,7 @@ public:
 	MdSpi(QObject *parent);
 	~MdSpi();
 
+public:
 	//定义帐户信息结构体
 	typedef struct MDStruct
 	{
