@@ -180,6 +180,8 @@ void ctp_algo_trade::MDLogin()
     strcpy(md->hq.PASSWORD, ch5);
     strcpy(md->hq.AuthCode, ch6);
     strcpy(md->hq.AppID, ch7);
+    strcpy(md->hq.INVESTOR_ID, ch4);
+    
     md->Init();
 
 
@@ -190,6 +192,7 @@ void ctp_algo_trade::MDLogin()
     strcpy(td->jy.PASSWORD, ch5);
     strcpy(td->jy.AuthCode, ch6);
     strcpy(td->jy.AppID, ch7);
+    strcpy(md->jy.INVESTOR_ID, ch4);
     td->Init();
 
 
