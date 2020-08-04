@@ -49,6 +49,13 @@ public:
 private:
 
 public:
+
+	///报单录入请求
+	void ReqOrderInsert(QString dm, QString lx, int lots, double price);
+	///报单操作请求
+	void ReqOrderAction(CThostFtdcOrderField* pOrder);
+
+
 	///当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
 	virtual void OnFrontConnected();
 
@@ -99,10 +106,7 @@ private:
 	void ReqQryTradingAccount();
 	///请求查询投资者持仓
 	void ReqQryInvestorPosition();
-	///报单录入请求
-	void ReqOrderInsert();
-	///报单操作请求
-	void ReqOrderAction(CThostFtdcOrderField* pOrder);
+
 
 	// 是否收到成功的响应
 	bool IsErrorRspInfo(CThostFtdcRspInfoField* pRspInfo);
@@ -110,6 +114,5 @@ private:
 	bool IsMyOrder(CThostFtdcOrderField* pOrder);
 	// 是否正在交易的报单
 	bool IsTradingOrder(CThostFtdcOrderField* pOrder);
-
 
 };

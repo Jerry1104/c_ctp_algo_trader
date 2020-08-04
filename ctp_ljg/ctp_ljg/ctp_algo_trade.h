@@ -18,13 +18,15 @@ public:
 
 private slots:
     void MDLogin();
+    void xd();
     void ReceiveHQ(QString);
     void ReceiveCJ(QString);
     void ReceiveWT(QString);
     void ReceiveCC(QString);
     void ReceiveZJ(QString);
     void ReceiveHY(QString);
-
+    void OnWTMenu(const QPoint& pt);
+    void cd();
 
 private:
     Ui::ctp_algo_tradeClass ui;

@@ -3,6 +3,7 @@
 #include "ThostFtdcTraderApi.h"
 #include "MdSpi.h"
 #include "TdSpi.h"
+//#include <QMessageBox>
 
 ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     : QMainWindow(parent)
@@ -17,6 +18,7 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     connect(td, SIGNAL(sendWT(QString)), this, SLOT(ReceiveWT(QString)));
     connect(td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveCC(QString)));
     connect(td, SIGNAL(sendHY(QString)), this, SLOT(ReceiveHY(QString)));
+    connect(ui.POrder_Button, SIGNAL(clicked()), this, SLOT(xd()));
 
     /**
     行情表
@@ -85,7 +87,6 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
 
     /**资金表  **/
     ui.ZJTable->setColumnCount(5);
-    ui.ZJTable->setRowCount(2);
 
     QStringList hqaderZJ;
     hqaderZJ.append(QString::fromLocal8Bit("账号"));
@@ -102,7 +103,6 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
 
     /**持仓表  **/
     ui.CCTable->setColumnCount(4);
-    ui.CCTable->setRowCount(6);
 
     QStringList hqaderCC;
     hqaderCC.append(QString::fromLocal8Bit("合约代码"));
@@ -138,17 +138,21 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     ui.BIDEdit->setText("9999");
     ui.UserEdit->setText("137829");
     ui.PWEdit->setEchoMode(QLineEdit::Password);
-    ui.PWEdit->setText("YIlxbei1104");
+    ui.PWEdit->setText("");
     ui.AuthCodeEdit->setText("0000000000000000");
     ui.AppIDEdit->setText("simnow_client_test");
 
-
+    //设置平今仓/市价的radio为选中
     ui.radioSJ->setChecked(true);
     ui.radioPJ->setChecked(true);
+
     ui.EditDm->setText("cu2009");
     ui.EditLots->setText("1");
 
-
+    //////////////右键菜单
+    ui.WTTable->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui.WTTable, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnWTMenu(const QPoint&)));
+    connect(ui.actioncd, SIGNAL(triggered()), this, SLOT(cd()));
 
 }
 
@@ -393,4 +397,102 @@ void ctp_algo_trade::ReceiveHY(QString HYData)
     ui.HYTable->setItem(row, 1, new QTableWidgetItem(strlist.at(1)));
     ui.HYTable->setItem(row, 2, new QTableWidgetItem(strlist.at(2)));
     ui.HYTable->setItem(row, 3, new QTableWidgetItem(strlist.at(3)));
+}
+
+//下单按钮下单
+void ctp_algo_trade::xd() {
+
+    QString dm = ui.EditDm->text();
+    int lots = ui.EditLots->text().toInt();
+
+    QString lx;
+    double wtprice;
+    double sjprice;
+    double xjprice;
+
+    int index = ui.comboXd->currentIndex();
+    if (ui.radioSJ->isChecked())
+    {
+        if (index == 0)
+        {
+            lx = "kd";
+            sjprice = ui.labelAsk->text().toDouble();
+            wtprice = sjprice;
+
+        }
+        if (index == 1)
+        {
+            lx = "pd";
+            sjprice = ui.labelBid->text().toDouble();
+            wtprice = sjprice;
+        }
+        if (index == 2)
+        {
+            lx = "kk";
+            sjprice = ui.labelBid->text().toDouble();
+            wtprice = sjprice;
+        }
+        if (index == 3)
+        {
+            lx = "pk";
+            sjprice = ui.labelAsk->text().toDouble();
+            wtprice = sjprice;
+        }
+    }
+    if (ui.radioXJ->isChecked())
+    {
+        if (index == 0)
+        {
+            lx = "kd";
+            xjprice = ui.EditXj->text().toDouble();
+            wtprice = xjprice;
+        }
+        if (index == 1)
+        {
+            lx = "pd";
+            xjprice = ui.EditXj->text().toDouble();
+            wtprice = xjprice;
+        }
+        if (index == 2)
+        {
+            lx = "kk";
+            xjprice = ui.EditXj->text().toDouble();
+            wtprice = xjprice;
+
+        }
+        if (index == 3)
+        {
+            lx = "pk";
+            xjprice = ui.EditXj->text().toDouble();
+            wtprice = xjprice;
+        }
+    }
+
+    td->ReqOrderInsert(dm, lx, lots, wtprice);
+
+
+}
+
+
+
+//撤单菜单
+void ctp_algo_trade::OnWTMenu(const QPoint& pt)
+{
+    QMenu menu;
+    menu.addAction(ui.actioncd);
+   // menu.addAction(ui.actionAdd);
+    menu.exec(ui.WTTable->mapToGlobal(pt));
+}
+
+//撤单
+void ctp_algo_trade::cd()
+{
+    int i = ui.WTTable->currentIndex().row(); //选中行
+    QString wth = ui.WTTable->item(i, 7)->text(); //委托号
+    QString jsy = ui.WTTable->item(i, 8)->text(); //交易所
+    QString brokerid = ui.BIDEdit->text();
+
+    //td->ReqOrderAction(brokerid, wth, jsy); //调报单接口
+
+   // QMessageBox::information(this, "", wth + "," + jsy + "," + brokerid);
 }

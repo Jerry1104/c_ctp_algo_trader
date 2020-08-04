@@ -186,7 +186,7 @@ void TdSpi::ReqQryInvestorPosition()
 
 void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* pInvestorPosition, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (pInvestorPosition == NULL)return;
+	if (pInvestorPosition->Position == 0 )return;
 	QString dm = pInvestorPosition->InstrumentID; //持仓代码
 	QString lx = pInvestorPosition->PosiDirection; //持仓多空方向
 	int lots = pInvestorPosition->Position; //持仓,一般用今仓
@@ -196,7 +196,7 @@ void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* pInvestorP
 	emit sendCC(CCData);
 }
 
-void TdSpi::ReqOrderInsert()
+void TdSpi::ReqOrderInsert(QString dm, QString lx, int lots, double price)
 {
 	CThostFtdcInputOrderField req;
 	memset(&req, 0, sizeof(req));
@@ -205,23 +205,42 @@ void TdSpi::ReqOrderInsert()
 	///投资者代码
 	strcpy(req.InvestorID, jy.INVESTOR_ID);
 	///合约代码
-	strcpy(req.InstrumentID, INSTRUMENT_ID);
+	strcpy(req.InstrumentID, dm.toStdString().data());
 	///报单引用
+	sprintf(ORDER_REF, "%d", iRequestID);	  //-------------
 	strcpy(req.OrderRef, ORDER_REF);
 	///用户代码
 	//	TThostFtdcUserIDType	UserID;
 	///报单价格条件: 限价
 	req.OrderPriceType = THOST_FTDC_OPT_LimitPrice;
-	///买卖方向: 
-	req.Direction = DIRECTION;
-	///组合开平标志: 开仓
-	req.CombOffsetFlag[0] = THOST_FTDC_OF_Open;
+
+	if (lx == "kd") //开多单
+	{
+		req.Direction = THOST_FTDC_D_Buy;
+		req.CombOffsetFlag[0] = THOST_FTDC_OF_Open;
+	}
+	if (lx == "pd")//平多单
+	{
+		req.Direction = THOST_FTDC_D_Sell;
+		req.CombOffsetFlag[0] = THOST_FTDC_OF_CloseToday;
+	}
+	if (lx == "kk") //开空单
+	{
+		req.Direction = THOST_FTDC_D_Sell;
+		req.CombOffsetFlag[0] = THOST_FTDC_OF_Open;
+	}
+	if (lx == "pk") //平空单
+	{
+		req.Direction = THOST_FTDC_D_Buy;
+		req.CombOffsetFlag[0] = THOST_FTDC_OF_CloseToday;
+	}
+
 	///组合投机套保标志
 	req.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
 	///价格
-	req.LimitPrice = LIMIT_PRICE;
+	req.LimitPrice = price;
 	///数量: 1
-	req.VolumeTotalOriginal = 1;
+	req.VolumeTotalOriginal = lots;
 	///有效期类型: 当日有效
 	req.TimeCondition = THOST_FTDC_TC_GFD;
 	///GTD日期
@@ -308,23 +327,23 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField* pOrder)
 {
 	//报单状态处理
 	QString zt;
-	if (pOrder->OrderStatus = THOST_FTDC_OST_AllTraded)
+	if (pOrder->OrderStatus == THOST_FTDC_OST_AllTraded)
 	{
 		zt = QString::fromLocal8Bit("全部成交");
 	}
-	else if (THOST_FTDC_OST_PartTradedQueueing)
-	{
-		zt = QString::fromLocal8Bit("部分成交");
-	}
-	else if (pOrder->OrderStatus = THOST_FTDC_OST_PartTradedNotQueueing)
-	{
-		zt = QString::fromLocal8Bit("部分成交");
-	}
-	else if (pOrder->OrderStatus = THOST_FTDC_OST_NoTradeQueueing)
+	else if (pOrder->OrderStatus == THOST_FTDC_OST_PartTradedQueueing)
 	{
 		zt = QString::fromLocal8Bit("未成交");
 	}
-	else if (pOrder->OrderStatus = THOST_FTDC_OST_Canceled)
+	else if (pOrder->OrderStatus == THOST_FTDC_OST_PartTradedNotQueueing)
+	{
+		zt = QString::fromLocal8Bit("部分成交");
+	}
+	else if (pOrder->OrderStatus == THOST_FTDC_OST_NoTradeQueueing)
+	{
+		zt = QString::fromLocal8Bit("未成交");
+	}
+	else if (pOrder->OrderStatus == THOST_FTDC_OST_Canceled)
 	{
 		zt = QString::fromLocal8Bit("已撤单");
 	}
@@ -359,6 +378,8 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField* pTrade)
 	QString CJData = cjtime + "," + dm + "," + bs + "," + kp + "," + lots + "," + price + "," + wth + "," + jys;
 
 	emit sendCJ(CJData);
+	//成交完成后调持仓查询
+	//ReqQryInvestorPosition();
 }
 
 void TdSpi::OnFrontDisconnected(int nReason)
