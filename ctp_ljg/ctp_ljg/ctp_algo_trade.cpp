@@ -138,11 +138,18 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     ui.BIDEdit->setText("9999");
     ui.UserEdit->setText("137829");
     ui.PWEdit->setEchoMode(QLineEdit::Password);
-    ui.PWEdit->setText("");
+    ui.PWEdit->setText("YIlxbei1104");
     ui.AuthCodeEdit->setText("0000000000000000");
     ui.AppIDEdit->setText("simnow_client_test");
+
+
     ui.radioSJ->setChecked(true);
     ui.radioPJ->setChecked(true);
+    ui.EditDm->setText("cu2009");
+    ui.EditLots->setText("1");
+
+
+
 }
 
 void ctp_algo_trade::MDLogin()
@@ -199,6 +206,16 @@ void ctp_algo_trade::MDLogin()
 void ctp_algo_trade::ReceiveHQ(QString TICK)
 {
     QStringList  strlist = TICK.split(",");	   //接收StringList数据
+   
+    if (strlist.at(0) == ui.EditDm->text())
+    {
+        ui.labelAsk->setText(strlist.at(5));
+        ui.labelLast->setText(strlist.at(2));
+        ui.labelBid->setText(strlist.at(3));
+        ui.labelUp->setText(strlist.at(9));
+        ui.labelDown->setText(strlist.at(10));
+    }
+
     //循环传入的数据
     for (int i = 0; i < ui.HQTable->rowCount(); i++)   //以 HQTable数量为边界
     {

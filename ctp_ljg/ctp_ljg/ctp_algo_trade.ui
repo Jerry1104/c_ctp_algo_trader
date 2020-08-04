@@ -319,7 +319,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_8"/>
+         <widget class="QLineEdit" name="EditXj"/>
         </item>
        </layout>
       </widget>
@@ -398,7 +398,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_6"/>
+        <widget class="QLineEdit" name="EditDm"/>
        </item>
       </layout>
      </widget>
@@ -420,7 +420,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_7"/>
+        <widget class="QLineEdit" name="EditLots"/>
        </item>
       </layout>
      </widget>
