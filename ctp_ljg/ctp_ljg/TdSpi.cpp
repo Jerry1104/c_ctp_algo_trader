@@ -1,7 +1,7 @@
 #include "TdSpi.h"
 #include <iostream>
 #include "ThostFtdcTraderApi.h"
-
+#include <windows.h>	//Sleep函数头文件
 using namespace std;
 
 
@@ -114,18 +114,27 @@ void TdSpi::ReqQryInstrument()
 
 void TdSpi::OnRspQryInstrument(CThostFtdcInstrumentField* pInstrument, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
+	if (pInstrument == NULL) return;
 	QString dm = pInstrument->InstrumentID; //合约代码
 	QString mc = QString::fromLocal8Bit(pInstrument->InstrumentName); //名称
 	QString cs = QString::number(pInstrument->VolumeMultiple);//合约乘数
 	QString ds = QString::number(pInstrument->PriceTick); //合约点数
 
-	QString hyData = dm + "," + mc + "," + cs + "," + ds;
-	emit sendHY(hyData);
-
 	hyarray[k][0] = dm;
 	hyarray[k][1] = mc;
 	hyarray[k][2] = cs;
 	hyarray[k][3] = ds;
+	k++;
+	if (bIsLast && !IsErrorRspInfo(pRspInfo))
+	{
+		//请求查询合约
+		Sleep(2000);
+		ReqQryTradingAccount();
+	}
+
+	QString hyData = dm + "," + mc + "," + cs + "," + ds;
+	emit sendHY(hyData);
+
 
 }
 
@@ -135,16 +144,29 @@ void TdSpi::ReqQryTradingAccount()
 	memset(&req, 0, sizeof(req));
 	strcpy(req.BrokerID, jy.BROKER_ID);
 	strcpy(req.InvestorID, jy.INVESTOR_ID);
+	strcpy(req.AccountID, jy.INVESTOR_ID);
+	strcpy(req.CurrencyID, "CNY");
+
 	int iResult = pUserApi->ReqQryTradingAccount(&req, ++iRequestID);
 	cerr << "--->>> 请求查询资金账户: " << ((iResult == 0) ? "成功" : "失败") << endl;
 }
 
 void TdSpi::OnRspQryTradingAccount(CThostFtdcTradingAccountField* pTradingAccount, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-	cerr << "--->>> " << "OnRspQryTradingAccount" << endl;
+	QString account = pTradingAccount->AccountID;					//帐户
+	double zqy = pTradingAccount->Balance;	//总权益
+	double bzj = pTradingAccount->CurrMargin; //占用保证金
+	double kyzj = pTradingAccount->Available;	//可用资金
+	double fxd = bzj * 100 / zqy;
+
+	QString ZJData = account + "," + QString("%1").arg(zqy, 0, 'f', 2) + "," + QString::number(bzj) + "," + QString::number(kyzj) + "," + QString::number(fxd);
+	emit sendZJ(ZJData);
+
 	if (bIsLast && !IsErrorRspInfo(pRspInfo))
 	{
 		///请求查询投资者持仓
+		//因为持仓查询具有延迟,无法正常显示,需要使用Sleep()
+		Sleep(2000); //windows.h
 		ReqQryInvestorPosition();
 	}
 }
@@ -160,14 +182,18 @@ void TdSpi::ReqQryInvestorPosition()
 	cerr << "--->>> 请求查询投资者持仓: " << ((iResult == 0) ? "成功" : "失败") << endl;
 }
 
+
+
 void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* pInvestorPosition, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-	cerr << "--->>> " << "OnRspQryInvestorPosition" << endl;
-	if (bIsLast && !IsErrorRspInfo(pRspInfo))
-	{
-		///报单录入请求
-		ReqOrderInsert();
-	}
+	if (pInvestorPosition == NULL)return;
+	QString dm = pInvestorPosition->InstrumentID; //持仓代码
+	QString lx = pInvestorPosition->PosiDirection; //持仓多空方向
+	int lots = pInvestorPosition->Position; //持仓,一般用今仓
+	double cb = pInvestorPosition->PositionCost / lots / hy(dm).hycs;	   //持仓成本 ,ag1612以吨计价
+
+	QString CCData = dm + "," + lx + "," + QString::number(lots) + "," + QString::number(cb);
+	emit sendCC(CCData);
 }
 
 void TdSpi::ReqOrderInsert()
@@ -277,7 +303,7 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField* pInputOrderAction,
 	IsErrorRspInfo(pRspInfo);
 }
 
-///报单通知
+///报单通知(委托)
 void TdSpi::OnRtnOrder(CThostFtdcOrderField* pOrder)
 {
 	//报单状态处理

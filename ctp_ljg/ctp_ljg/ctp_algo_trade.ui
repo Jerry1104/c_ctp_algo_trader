@@ -677,7 +677,7 @@
      <enum>QTabWidget::North</enum>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -734,7 +734,7 @@
         <x>0</x>
         <y>0</y>
         <width>941</width>
-        <height>71</height>
+        <height>181</height>
        </rect>
       </property>
      </widget>
@@ -742,9 +742,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>70</y>
+        <y>180</y>
         <width>941</width>
-        <height>751</height>
+        <height>641</height>
        </rect>
       </property>
      </widget>

@@ -12,7 +12,6 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     md = new MdSpi(this);
     td = new TdSpi(this);
 
-
     connect(md, SIGNAL(sendData(QString)), this, SLOT(ReceiveHQ(QString)));
     connect(td, SIGNAL(sendCJ(QString)), this, SLOT(ReceiveCJ(QString)));
     connect(td, SIGNAL(sendWT(QString)), this, SLOT(ReceiveWT(QString)));
@@ -132,12 +131,10 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     ui.HYTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.HYTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     
-
-
-
-
-    ui.MDEdit->setText("tcp://180.168.146.187:10131");
-    ui.TDEdit->setText("tcp://180.168.146.187:10130");
+    
+    //登录信息
+    ui.MDEdit->setText("tcp://180.168.146.187:10111");
+    ui.TDEdit->setText("tcp://180.168.146.187:10101");
     ui.BIDEdit->setText("9999");
     ui.UserEdit->setText("137829");
     ui.PWEdit->setEchoMode(QLineEdit::Password);
@@ -192,9 +189,8 @@ void ctp_algo_trade::MDLogin()
     strcpy(td->jy.PASSWORD, ch5);
     strcpy(td->jy.AuthCode, ch6);
     strcpy(td->jy.AppID, ch7);
-    strcpy(md->jy.INVESTOR_ID, ch4);
+    strcpy(td->jy.INVESTOR_ID, ch4);
     td->Init();
-
 
 
 }
@@ -341,13 +337,31 @@ void ctp_algo_trade::ReceiveWT(QString WTData)
 
 void ctp_algo_trade::ReceiveCC(QString CCData)
 {
+    QString lx;
+    QStringList strlist = CCData.split(",");
+    if (strlist.at(1) == "2") { lx = QString::fromLocal8Bit("买"); }
+    if (strlist.at(1) == "3") { lx = QString::fromLocal8Bit("卖"); }
 
+    int row = ui.CCTable->rowCount();
+    ui.CCTable->insertRow(row);
+    ui.CCTable->setItem(row, 0, new QTableWidgetItem(strlist.at(0)));
+    ui.CCTable->setItem(row, 1, new QTableWidgetItem(lx));
+    ui.CCTable->setItem(row, 2, new QTableWidgetItem(strlist.at(2)));
+    ui.CCTable->setItem(row, 3, new QTableWidgetItem(strlist.at(3)));
 }
 
 
 void ctp_algo_trade::ReceiveZJ(QString ZJData)
 {
-
+    QStringList  strlist = ZJData.split(",");	   //接收StringList数据
+    //循环传入的数据
+    int row = ui.ZJTable->rowCount();
+    ui.ZJTable->insertRow(row);
+    ui.ZJTable->setItem(row, 0, new QTableWidgetItem(strlist.at(0)));
+    ui.ZJTable->setItem(row, 1, new QTableWidgetItem(strlist.at(1)));
+    ui.ZJTable->setItem(row, 2, new QTableWidgetItem(strlist.at(2)));
+    ui.ZJTable->setItem(row, 3, new QTableWidgetItem(strlist.at(3)));
+    ui.ZJTable->setItem(row, 4, new QTableWidgetItem(strlist.at(4)));
 }
 
 

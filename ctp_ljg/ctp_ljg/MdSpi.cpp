@@ -89,6 +89,7 @@ void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificIns
 	cerr << __FUNCTION__ << endl;
 }
 
+///深度行情通知
 void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField* pDepthMarketData)
 {
 	//cerr << __FUNCTION__ << endl;
