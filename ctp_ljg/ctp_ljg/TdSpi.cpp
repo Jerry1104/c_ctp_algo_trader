@@ -274,47 +274,70 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField* pInputOrder, CThostFtdcR
 	IsErrorRspInfo(pRspInfo);
 }
 
-void TdSpi::ReqOrderAction(CThostFtdcOrderField* pOrder)
-{
-	static bool ORDER_ACTION_SENT = false;		//是否发送了报单
-	if (ORDER_ACTION_SENT)
-		return;
+void TdSpi::ReqOrderAction(QString brokerid, QString wth, QString jys) {
+	QByteArray ba = brokerid.toLatin1();
+	char* pbid = ba.data();
+	QByteArray bw = wth.toLatin1();
+	char* pwth = bw.data();
+	QByteArray bj = jys.toLatin1();
+	char* pjys = bj.data();
 
 	CThostFtdcInputOrderActionField req;
 	memset(&req, 0, sizeof(req));
 	///经纪公司代码
-	strcpy(req.BrokerID, pOrder->BrokerID);
-	///投资者代码
-	strcpy(req.InvestorID, pOrder->InvestorID);
-	///报单操作引用
-	//	TThostFtdcOrderActionRefType	OrderActionRef;
-	///报单引用
-	strcpy(req.OrderRef, pOrder->OrderRef);
-	///请求编号
-	//	TThostFtdcRequestIDType	RequestID;
-	///前置编号
-	req.FrontID = FRONT_ID;
-	///会话编号
-	req.SessionID = SESSION_ID;
-	///交易所代码
-	//	TThostFtdcExchangeIDType	ExchangeID;
-	///报单编号
-	//	TThostFtdcOrderSysIDType	OrderSysID;
+	strcpy(req.BrokerID, pbid);
+	strcpy(req.OrderSysID, pwth); //委托号
+	strcpy(req.ExchangeID, pjys); //交易所
+
 	///操作标志
 	req.ActionFlag = THOST_FTDC_AF_Delete;
-	///价格
-	//	TThostFtdcPriceType	LimitPrice;
-	///数量变化
-	//	TThostFtdcVolumeType	VolumeChange;
-	///用户代码
-	//	TThostFtdcUserIDType	UserID;
-	///合约代码
-	strcpy(req.InstrumentID, pOrder->InstrumentID);
-
 	int iResult = pUserApi->ReqOrderAction(&req, ++iRequestID);
-	cerr << "--->>> 报单操作请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
-	ORDER_ACTION_SENT = true;
+
+
 }
+
+
+//void TdSpi::ReqOrderAction(CThostFtdcOrderField* pOrder)
+//{
+//	static bool ORDER_ACTION_SENT = false;		//是否发送了报单
+//	if (ORDER_ACTION_SENT)
+//		return;
+//
+//	CThostFtdcInputOrderActionField req;
+//	memset(&req, 0, sizeof(req));
+//	///经纪公司代码
+//	strcpy(req.BrokerID, pOrder->BrokerID);
+//	///投资者代码
+//	strcpy(req.InvestorID, pOrder->InvestorID);
+//	///报单操作引用
+//	//	TThostFtdcOrderActionRefType	OrderActionRef;
+//	///报单引用
+//	strcpy(req.OrderRef, pOrder->OrderRef);
+//	///请求编号
+//	//	TThostFtdcRequestIDType	RequestID;
+//	///前置编号
+//	req.FrontID = FRONT_ID;
+//	///会话编号
+//	req.SessionID = SESSION_ID;
+//	///交易所代码
+//	//	TThostFtdcExchangeIDType	ExchangeID;
+//	///报单编号
+//	//	TThostFtdcOrderSysIDType	OrderSysID;
+//	///操作标志
+//	req.ActionFlag = THOST_FTDC_AF_Delete;
+//	///价格
+//	//	TThostFtdcPriceType	LimitPrice;
+//	///数量变化
+//	//	TThostFtdcVolumeType	VolumeChange;
+//	///用户代码
+//	//	TThostFtdcUserIDType	UserID;
+//	///合约代码
+//	strcpy(req.InstrumentID, pOrder->InstrumentID);
+//
+//	int iResult = pUserApi->ReqOrderAction(&req, ++iRequestID);
+//	cerr << "--->>> 报单操作请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
+//	ORDER_ACTION_SENT = true;
+//}
 
 void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField* pInputOrderAction, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {

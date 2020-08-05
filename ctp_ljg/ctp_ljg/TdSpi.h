@@ -52,8 +52,12 @@ public:
 
 	///报单录入请求
 	void ReqOrderInsert(QString dm, QString lx, int lots, double price);
-	///报单操作请求
-	void ReqOrderAction(CThostFtdcOrderField* pOrder);
+	
+	///报单操作请求(撤单)
+	void ReqOrderAction(QString brokerid, QString wth, QString jys);
+
+	///报单操作请求(撤单)
+	//void ReqOrderAction(CThostFtdcOrderField* pOrder);
 
 
 	///当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。

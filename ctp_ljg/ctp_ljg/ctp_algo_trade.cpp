@@ -138,7 +138,7 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     ui.BIDEdit->setText("9999");
     ui.UserEdit->setText("137829");
     ui.PWEdit->setEchoMode(QLineEdit::Password);
-    ui.PWEdit->setText("");
+    ui.PWEdit->setText("YIlxbei1104");
     ui.AuthCodeEdit->setText("0000000000000000");
     ui.AppIDEdit->setText("simnow_client_test");
 
@@ -492,7 +492,6 @@ void ctp_algo_trade::cd()
     QString jsy = ui.WTTable->item(i, 8)->text(); //交易所
     QString brokerid = ui.BIDEdit->text();
 
-    //td->ReqOrderAction(brokerid, wth, jsy); //调报单接口
-
+    td->ReqOrderAction(brokerid, wth, jsy); //调报单接口
    // QMessageBox::information(this, "", wth + "," + jsy + "," + brokerid);
 }
