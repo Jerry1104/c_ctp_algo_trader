@@ -144,10 +144,10 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     
     
     //µÇÂ¼ÐÅÏ¢
-    ui.MDEdit->setText("tcp://180.168.146.187:10111");
+   /* ui.MDEdit->setText("tcp://180.168.146.187:10111");
     ui.TDEdit->setText("tcp://180.168.146.187:10101");
     ui.BIDEdit->setText("9999");
-    ui.UserEdit->setText("137829");
+    ui.UserEdit->setText("137829");*/
     ui.PWEdit->setEchoMode(QLineEdit::Password);
     ui.PWEdit->setText("YIlxbei1104");
     ui.AuthCodeEdit->setText("0000000000000000");
