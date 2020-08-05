@@ -182,9 +182,9 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="CannelButton">
+       <widget class="QPushButton" name="Btnxml">
         <property name="text">
-         <string>取消</string>
+         <string>退出</string>
         </property>
        </widget>
       </item>

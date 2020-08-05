@@ -6,7 +6,14 @@
 #include "ThostFtdcTraderApi.h"
 #include "MdSpi.h"
 #include "TdSpi.h"
-
+#include "tinystr.h"
+#include "tinyxml.h"
+#include <string>
+#include <cstring>
+#include <iostream>
+#include <windows.h>
+#include <atlstr.h>	  //Cstring函数头文件
+using namespace std;
 class ctp_algo_trade : public QMainWindow
 {
     Q_OBJECT
@@ -27,7 +34,10 @@ private slots:
     void ReceiveHY(QString);
     void OnWTMenu(const QPoint& pt);
     void cd();
+    void Onxml();
 
+    CString GetAppPath(); //获取路径
+    bool writexml(string& szFileName);
 private:
     Ui::ctp_algo_tradeClass ui;
   

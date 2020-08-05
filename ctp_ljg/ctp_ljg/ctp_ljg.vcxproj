@@ -93,6 +93,10 @@
   <ItemGroup>
     <ClCompile Include="MdSpi.cpp" />
     <ClCompile Include="TdSpi.cpp" />
+    <ClCompile Include="tinystr.cpp" />
+    <ClCompile Include="tinyxml.cpp" />
+    <ClCompile Include="tinyxmlerror.cpp" />
+    <ClCompile Include="tinyxmlparser.cpp" />
     <QtRcc Include="ctp_algo_trade.qrc" />
     <QtUic Include="ctp_algo_trade.ui" />
     <QtMoc Include="ctp_algo_trade.h" />
@@ -104,6 +108,10 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="TdSpi.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tinystr.h" />
+    <ClInclude Include="tinyxml.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -4,6 +4,14 @@
 #include "MdSpi.h"
 #include "TdSpi.h"
 //#include <QMessageBox>
+#include "tinystr.h"
+#include "tinyxml.h"
+#include <iostream>
+#include <string>
+#include <windows.h>
+#include <atlstr.h>
+
+using namespace std;
 
 ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     : QMainWindow(parent)
@@ -19,6 +27,9 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     connect(td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveCC(QString)));
     connect(td, SIGNAL(sendHY(QString)), this, SLOT(ReceiveHY(QString)));
     connect(ui.POrder_Button, SIGNAL(clicked()), this, SLOT(xd()));
+
+
+    connect(ui.Btnxml, SIGNAL(clicked()), this, SLOT(Onxml()));
 
     /**
     行情表
@@ -494,4 +505,75 @@ void ctp_algo_trade::cd()
 
     td->ReqOrderAction(brokerid, wth, jsy); //调报单接口
    // QMessageBox::information(this, "", wth + "," + jsy + "," + brokerid);
+}
+
+
+//登录在xml配置信息
+bool ctp_algo_trade::writexml(string& szFileName)
+{
+    try
+    {
+        TiXmlDocument* myDocument = new TiXmlDocument();  //创建一个XML的文档对象;
+        TiXmlElement* RootElement = new TiXmlElement("Persons");	  //创建根元素
+        myDocument->LinkEndChild(RootElement); //连接
+        TiXmlElement* PersonElement = new TiXmlElement("Persons");
+        RootElement->LinkEndChild(PersonElement);
+
+        PersonElement->SetAttribute("ID", "1");	  //创建元素
+
+        TiXmlElement* MDElement = new TiXmlElement("行情地址");
+        TiXmlElement* TDElement = new TiXmlElement("交易地址");
+        TiXmlElement* BIDElement = new TiXmlElement("BrokerID");
+        TiXmlElement* ACCOUNTElement = new TiXmlElement("帐号");
+
+        PersonElement->LinkEndChild(MDElement);
+        PersonElement->LinkEndChild(TDElement);
+        PersonElement->LinkEndChild(BIDElement);
+        PersonElement->LinkEndChild(ACCOUNTElement);  //创建子元素并连接
+
+        QByteArray xmlmd = ui.MDEdit->text().toLatin1();
+        const char* md = xmlmd.data();	  //把QString 转化成char类型
+        QByteArray xmltd = ui.TDEdit->text().toLatin1();
+        const char* td = xmltd.data();
+        QByteArray xmlbid = ui.BIDEdit->text().toLatin1();
+        const char* bid = xmlbid.data();
+        QByteArray xmlaccount = ui.UserEdit->text().toLatin1();
+        const char* account = xmlaccount.data();
+
+        TiXmlText* MDContent = new TiXmlText(md);
+        TiXmlText* TDContext = new TiXmlText(td);
+        TiXmlText* BIDContext = new TiXmlText(bid);
+        TiXmlText* ACCOUNTContext = new TiXmlText(account);
+
+        MDElement->LinkEndChild(MDContent);
+        TDElement->LinkEndChild(TDContext);
+        BIDElement->LinkEndChild(BIDContext);
+        ACCOUNTElement->LinkEndChild(ACCOUNTContext);
+
+
+        CString appPath = GetAppPath();
+        string seperator = "\\";
+        string fullPath = szFileName;
+        myDocument->SaveFile(fullPath.c_str());	 //保存到文件
+    }
+    catch (string& e)
+    {
+        return false;
+    }
+    return true;
+}
+
+void ctp_algo_trade::Onxml()
+{
+    string filename = "config.xml";
+    writexml(filename);
+}
+
+CString ctp_algo_trade::GetAppPath()
+{
+    TCHAR modulePath[MAX_PATH];
+    GetModuleFileName(NULL, modulePath, MAX_PATH);
+    CString strModulePath(modulePath);
+    strModulePath = strModulePath.Left(strModulePath.ReverseFind(_T('\\')));
+    return strModulePath;
 }
