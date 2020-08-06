@@ -14,7 +14,7 @@
 #include <QTextStream>
 
 using namespace std;
-
+extern QString hyarray[2000][4];
 ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     : QMainWindow(parent)
 {
@@ -28,14 +28,19 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
 
 
     connect(md, SIGNAL(sendData(QString)), this, SLOT(ReceiveHQ(QString)));
+    connect(md, SIGNAL(sendData(QString)), this, SLOT(ReceiveAutoHQ(QString)));
     connect(td, SIGNAL(sendCJ(QString)), this, SLOT(ReceiveCJ(QString)));
     connect(td, SIGNAL(sendWT(QString)), this, SLOT(ReceiveWT(QString)));
     connect(td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveCC(QString)));
+    connect(td, SIGNAL(sendZJ(QString)), this, SLOT(ReceiveZJ(QString)));
+    connect(td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveAutoCC(QString)));
     connect(td, SIGNAL(sendHY(QString)), this, SLOT(ReceiveHY(QString)));
     connect(ui.POrder_Button, SIGNAL(clicked()), this, SLOT(xd()));
 
 
     connect(ui.Btnxml, SIGNAL(clicked()), this, SLOT(Onxml()));
+
+
 
     /**
     行情表
@@ -308,6 +313,54 @@ void ctp_algo_trade::ReceiveHQ(QString TICK)
     ui.HQTable->setItem(row, 10, new QTableWidgetItem(strlist.at(10)));
 }
 
+int hy(QString dm)
+{
+    int hycs;
+    for (int i = 0; i < 500; i++)
+    {
+        if (dm == hyarray[i][0])
+        {
+            hycs = hyarray[i][2].toInt();
+            break;
+        }
+    }
+    return hycs;
+
+}
+void ctp_algo_trade::ReceiveAutoHQ(QString TICK)
+{
+    QStringList  strlist = TICK.split(",");	   //接收StringList数据
+  //  WriteTxt(strlist.at(0) + ".txt", TICK);
+
+   /* if (strlist.at(0) == ui.EditDm->text())
+    {
+        ui.labelAsk->setText(strlist.at(5));
+        ui.labelLast->setText(strlist.at(2));
+        ui.labelBid->setText(strlist.at(3));
+        ui.labelUp->setText(strlist.at(9));
+        ui.labelDown->setText(strlist.at(10));
+    }*/
+
+    //循环传入的数据
+    for (int i = 0; i < ui.DayTable->rowCount(); i++)   //以 HQTable数量为边界
+    {
+        if (ui.DayTable->item(i, 0)->text() == strlist.at(0))
+        {
+
+            ui.DayTable->setItem(i, 1, new QTableWidgetItem(strlist.at(1)));	  //更新时间
+            ui.DayTable->setItem(i, 9, new QTableWidgetItem(strlist.at(11)));
+            ui.DayTable->setItem(i, 10, new QTableWidgetItem(strlist.at(3)));	  //买一价
+            ui.DayTable->setItem(i, 11, new QTableWidgetItem(strlist.at(5)));	  //卖一价
+            ui.DayTable->setItem(i, 12, new QTableWidgetItem(strlist.at(2)));	   //最新价显示
+           if (ui.DayTable->item(i, 2) == NULL)return;
+            if (ui.DayTable->item(i, 2)->text() == "") { ui.DayTable->setItem(i, 5, new QTableWidgetItem("")); return; }
+            double yk = (strlist.at(2).toDouble() - ui.DayTable->item(i, 2)->text().toDouble()) * hy(strlist.at(0));
+            ui.DayTable->setItem(i, 5, new QTableWidgetItem(QString::number(yk)));
+
+            return;
+        }
+    }
+}
 
 void ctp_algo_trade::ReceiveCJ(QString CJData)
 {
@@ -425,6 +478,26 @@ void ctp_algo_trade::ReceiveCC(QString CCData)
     ui.CCTable->setItem(row, 3, new QTableWidgetItem(strlist.at(3)));
 }
 
+void ctp_algo_trade::ReceiveAutoCC(QString CCData)
+{
+
+    QString lx;
+    QStringList strlist = CCData.split(",");
+    if (strlist.at(1) == "2") { lx = QString::fromLocal8Bit("买"); }
+    if (strlist.at(1) == "3") { lx = QString::fromLocal8Bit("卖"); }
+
+    for (int i = 0; i < ui.DayTable->rowCount(); i++)
+    {
+        if (ui.DayTable->item(i, 0)->text() == strlist.at(0))
+        {
+
+            ui.DayTable->setItem(i, 2, new QTableWidgetItem(strlist.at(3)));	 //3是价格
+            ui.DayTable->setItem(i, 3, new QTableWidgetItem(lx));
+            ui.DayTable->setItem(i, 4, new QTableWidgetItem(strlist.at(2))); //2是数量 
+            return;
+        }
+    }
+}
 
 void ctp_algo_trade::ReceiveZJ(QString ZJData)
 {
@@ -439,6 +512,21 @@ void ctp_algo_trade::ReceiveZJ(QString ZJData)
     ui.ZJTable->setItem(row, 4, new QTableWidgetItem(strlist.at(4)));
 }
 
+
+void ctp_algo_trade::ReceiveAutoZJ(QString ZJData)
+{
+    QStringList  strlist = ZJData.split(",");	   //接收StringList数据
+    for (int i = 0; i < ui.DayTable->rowCount(); i++)
+    {
+        if (ui.DayTable->item(i, 0)->text() == strlist.at(0))
+        {
+
+            ui.DayTable->setItem(i, 2, new QTableWidgetItem(strlist.at(2)));
+            ui.DayTable->setItem(i, 3, new QTableWidgetItem(strlist.at(3)));
+            ui.DayTable->setItem(i, 4, new QTableWidgetItem(strlist.at(4)));
+        }
+    }
+}
 
 
 void ctp_algo_trade::ReceiveHY(QString HYData)
@@ -720,31 +808,22 @@ void ctp_algo_trade::ReadTxt(QString path, int flag)
         {
             QByteArray line = file.readLine();
             QString str(line);
-
             //过滤txt末尾为空
             if (str.trimmed() == "") continue;
-
-
             QStringList strlist = str.split(",");
-
             int row = ui.DayTable->rowCount();
             ui.DayTable->insertRow(row);
             ui.DayTable->setItem(row, 0, new QTableWidgetItem(strlist.at(0)));
             ui.DayTable->setItem(row, 6, new QTableWidgetItem(strlist.at(1)));
             ui.DayTable->setItem(row, 7, new QTableWidgetItem(strlist.at(2)));
             ui.DayTable->setItem(row, 8, new QTableWidgetItem(strlist.at(3)));
-
-
             strdm.append(strlist.at(0));
-
             md->dm = strdm.join(",");
-
-
 
         }
     }
 }
-
+//配置风险
 void ctp_algo_trade::AddHeyue()
 {
     int row = ui.DayTable->rowCount();

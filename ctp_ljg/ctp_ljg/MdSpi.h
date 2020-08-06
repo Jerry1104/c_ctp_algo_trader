@@ -9,7 +9,7 @@ class MdSpi : public QObject , public CThostFtdcMdSpi
 
 public:
 	MdSpi(QObject *parent);
-	~MdSpi();
+	
 
 public:
 	//定义帐户信息结构体
@@ -69,6 +69,8 @@ public:
 private:
 	void ReqUserLogin();
 	void SubscribeMarketData();
+
+	void SubscribeMarketData(QString dm);
 	// 
 	bool IsErrorRspInfo(CThostFtdcRspInfoField* pRspInfo);
 	

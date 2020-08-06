@@ -186,13 +186,27 @@ void TdSpi::ReqQryInvestorPosition()
 
 void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* pInvestorPosition, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (pInvestorPosition->Position == 0 )return;
+	if (pInvestorPosition == NULL)return;
+	//if (pInvestorPosition->Position==0)return;
 	QString dm = pInvestorPosition->InstrumentID; //持仓代码
 	QString lx = pInvestorPosition->PosiDirection; //持仓多空方向
 	int lots = pInvestorPosition->Position; //持仓,一般用今仓
-	double cb = pInvestorPosition->PositionCost / lots / hy(dm).hycs;	   //持仓成本 ,ag1612以吨计价
+	double cb = 0;
+	if (lots != 0)
+	{
+		cb = pInvestorPosition->PositionCost / lots / hy(dm).hycs;	   //持仓成本 ,ag2012以吨计价
+	}
+	QString strlots = QString::number(lots);
+	QString strcb = QString::number(cb);
 
-	QString CCData = dm + "," + lx + "," + QString::number(lots) + "," + QString::number(cb);
+
+	if (lots == 0)
+	{
+		lx = "";
+		strlots = "";
+		strcb = "";
+	}
+	QString CCData = dm + "," + lx + "," + strlots + "," + strcb;
 	emit sendCC(CCData);
 }
 

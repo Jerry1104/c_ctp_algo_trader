@@ -28,10 +28,13 @@ private slots:
     void MDLogin();
     void xd();
     void ReceiveHQ(QString);
+    void ReceiveAutoHQ(QString);
     void ReceiveCJ(QString);
     void ReceiveWT(QString);
+    void ReceiveAutoCC(QString);
     void ReceiveCC(QString);
     void ReceiveZJ(QString);
+    void ReceiveAutoZJ(QString);
     void ReceiveHY(QString);
     void OnWTMenu(const QPoint& pt);
     void cd();

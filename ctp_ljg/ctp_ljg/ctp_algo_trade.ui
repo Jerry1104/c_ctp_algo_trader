@@ -677,7 +677,7 @@
      <enum>QTabWidget::North</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -766,7 +766,7 @@
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
-      <string>日内交易</string>
+      <string>日内交易风险管控</string>
      </attribute>
      <widget class="QTableWidget" name="DayTable">
       <property name="geometry">

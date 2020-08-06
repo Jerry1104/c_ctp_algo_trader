@@ -5,19 +5,15 @@ using namespace std;
 #pragma warning(disable: 4996)
 
 
-char* ppInstrumentID[] = { "cu2009","au2012","ag2012","zn2009","al2009","ru2009","rb2010","fu2009","hc2010" ,"bu2012","pb2009","ni2010" ,"sn2010","sp2009","ss2009"
+char* ppInstrumentID[] = {"cu2009","au2012","ag2012","al2009","ru2009","rb2010","fu2009","hc2010" ,"bu2012","pb2009","ni2010" ,"sn2010","sp2009","ss2009"
 ,"a2009","b2009","c2009" ,"cs2009","i2009","j2009" ,"jd2009","l2009","m2009" ,"p2009","pp2009","v2009" ,"y2009","eg2009","rr2009" ,"eb2009","pg2009"
 ,"MA009" ,"TA009","SR009","CF009" ,"FG009","RM009","AP010" ,"SA009","OI009","ZC009" ,"SM009" ,"SF009","CJ009","CY009" }; //订阅行情列表
-int  iInstrumentID = 46;//订阅行情个数
+int  iInstrumentID = 45;//订阅行情个数
 // 请求编号
 int iRequestID;
 
 MdSpi::MdSpi(QObject *parent)
 	: QObject(parent)
-{
-}
-
-MdSpi::~MdSpi()
 {
 }
 
@@ -79,6 +75,26 @@ void MdSpi::SubscribeMarketData()
 	cerr << "--->>> 发送行情订阅请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
 }
 
+//自动交易模块化行情代码部分
+void MdSpi::SubscribeMarketData(QString dm)
+{
+	QStringList strlist = dm.split(",");
+	int iInstrumentID = strlist.length();
+	for (int i = 0; i < iInstrumentID; i++)
+	{
+		QString str = strlist.at(i);
+		char* ch;
+		QByteArray ba = str.toLatin1();
+		ch = ba.data();
+		char* myppInstrumentID[] = { ch };
+		int iRequestID = pUserApi->SubscribeMarketData(myppInstrumentID, 1); //每次只发送一个
+
+	}
+	cerr << "--->>>发送行情订阅请求:" << ((iRequestID == 0) ? "成功" : "失败") << endl;
+}
+
+
+
 void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInstrument, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 	cerr << __FUNCTION__ << endl;
@@ -89,7 +105,7 @@ void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificIns
 	cerr << __FUNCTION__ << endl;
 }
 
-///深度行情通知
+//返回合约代码具体信息
 void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField* pDepthMarketData)
 {
 	//cerr << __FUNCTION__ << endl;
@@ -105,8 +121,9 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField* pDepthMarketDat
 	QString vol = QString::number(pDepthMarketData->Volume); //成交量
 	QString zt = QString::number(pDepthMarketData->UpperLimitPrice); //涨停价
 	QString dt = QString::number(pDepthMarketData->LowerLimitPrice); //跌停价
+	QString openprice = QString::number(pDepthMarketData->OpenPrice);	 //开盘价
 
-	QString HQTick = dm + "," + updatetime + "," + lastprice + "," + buyprice + "," + buyvol + "," + sellprice + "," + sellvol + "," + zf + "," + vol + "," + zt + "," + dt;	 //使用信号传递数据
+	QString HQTick = dm + "," + updatetime + "," + lastprice + "," + buyprice + "," + buyvol + "," + sellprice + "," + sellvol + "," + zf + "," + vol + "," + zt + "," + dt + "," + openprice;	 //使用信号传递数据
 	emit sendData(HQTick); //只是发送了数据，需要接收端接收数据 ，a,在ctp.h头文件定义接收方法 b, 通过SLOT连接
 }
 
