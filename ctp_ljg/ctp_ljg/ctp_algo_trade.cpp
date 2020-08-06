@@ -20,6 +20,10 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
 
     md = new MdSpi(this);
     td = new TdSpi(this);
+    string filename = "config.xml";
+    readxml(filename);
+
+
 
     connect(md, SIGNAL(sendData(QString)), this, SLOT(ReceiveHQ(QString)));
     connect(td, SIGNAL(sendCJ(QString)), this, SLOT(ReceiveCJ(QString)));
@@ -144,12 +148,12 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     
     
     //登录信息
-   /* ui.MDEdit->setText("tcp://180.168.146.187:10111");
+    /*ui.MDEdit->setText("tcp://180.168.146.187:10111");
     ui.TDEdit->setText("tcp://180.168.146.187:10101");
     ui.BIDEdit->setText("9999");
     ui.UserEdit->setText("137829");*/
     ui.PWEdit->setEchoMode(QLineEdit::Password);
-    ui.PWEdit->setText("YIlxbei1104");
+    ui.PWEdit->setText("");
     ui.AuthCodeEdit->setText("0000000000000000");
     ui.AppIDEdit->setText("simnow_client_test");
 
@@ -576,4 +580,41 @@ CString ctp_algo_trade::GetAppPath()
     CString strModulePath(modulePath);
     strModulePath = strModulePath.Left(strModulePath.ReverseFind(_T('\\')));
     return strModulePath;
+}
+
+
+bool ctp_algo_trade::readxml(string& szFileName)
+{
+    try {
+        CString 	appPath = GetAppPath();
+        string seperator = "\\";
+        string fullPath = szFileName;
+
+        TiXmlDocument* myDocument = new TiXmlDocument(fullPath.c_str()); //把string类型转化成char类型
+        myDocument->LoadFile(); //创建一个文档对象
+
+        TiXmlElement* RootElement = myDocument->RootElement(); //获取根元素
+        TiXmlElement* FirstPerson = RootElement->FirstChildElement(); //获取第一个节点
+        TiXmlElement* MDElement = FirstPerson->FirstChildElement();
+        TiXmlElement* TDElement = MDElement->NextSiblingElement();
+        TiXmlElement* BIDElement = TDElement->NextSiblingElement();	 //顺序获取下一个元素
+        TiXmlElement* ACCOUNTElement = BIDElement->NextSiblingElement();
+
+        TiXmlAttribute* IDAttribute = FirstPerson->FirstAttribute();
+        QString md, td, bid, account;
+        md = MDElement->FirstChild()->Value();
+        td = TDElement->FirstChild()->Value();
+        bid = BIDElement->FirstChild()->Value();
+        account = ACCOUNTElement->FirstChild()->Value();
+
+        ui.MDEdit->setText(md);
+        ui.TDEdit->setText(td);
+        ui.BIDEdit->setText(bid);
+        ui.UserEdit->setText(account);
+    }
+    catch (string& e)
+    {
+        return false;
+    }
+    return true;
 }

@@ -37,7 +37,8 @@ private slots:
     void Onxml();
 
     CString GetAppPath(); //获取路径
-    bool writexml(string& szFileName);
+    bool writexml(string& szFileName); //xml写入
+    bool readxml(string& szFileName);//xml读取
 private:
     Ui::ctp_algo_tradeClass ui;
   
