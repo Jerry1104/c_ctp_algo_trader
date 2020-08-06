@@ -150,7 +150,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>15</x>
@@ -190,7 +190,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>40</x>
@@ -677,7 +677,7 @@
      <enum>QTabWidget::North</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>6</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -779,6 +779,21 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_7">
+     <attribute name="title">
+      <string>数据</string>
+     </attribute>
+     <widget class="QTextEdit" name="textEdit">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>941</width>
+        <height>801</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_log">
     <property name="geometry">
@@ -803,7 +818,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_4">
+   <widget class="QLineEdit" name="lineEditdm">
     <property name="geometry">
      <rect>
       <x>660</x>
@@ -826,7 +841,7 @@
      <string>全自动交易运行</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QLineEdit" name="lineEditpctime">
     <property name="geometry">
      <rect>
       <x>664</x>
@@ -849,7 +864,7 @@
      <string>00:00:00</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_2">
+   <widget class="QLineEdit" name="lineEditbzj">
     <property name="geometry">
      <rect>
       <x>664</x>
@@ -859,7 +874,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_3">
+   <widget class="QLineEdit" name="lineEditloss">
     <property name="geometry">
      <rect>
       <x>664</x>
@@ -994,8 +1009,8 @@
    <slot>MDLogin()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1035</x>
-     <y>209</y>
+     <x>1055</x>
+     <y>245</y>
     </hint>
     <hint type="destinationlabel">
      <x>924</x>
@@ -1003,8 +1018,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ctp_algo_tradeClass</receiver>
+   <slot>OnAddHeyue()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>845</x>
+     <y>906</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>853</x>
+     <y>954</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>MDLogin()</slot>
+  <slot>OnAddHeyue()</slot>
  </slots>
 </ui>

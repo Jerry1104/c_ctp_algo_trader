@@ -20,6 +20,7 @@ class ctp_algo_trade : public QMainWindow
 
 public:
     ctp_algo_trade(QWidget *parent = Q_NULLPTR);
+    ~ctp_algo_trade();
     MdSpi* md;
     TdSpi* td;
 
@@ -35,12 +36,17 @@ private slots:
     void OnWTMenu(const QPoint& pt);
     void cd();
     void Onxml();
-
+    void OnExit();
     CString GetAppPath(); //获取路径
     bool writexml(string& szFileName); //xml写入
     bool readxml(string& szFileName);//xml读取
+    void OnAddHeyue();  //自动交易合约添加
 private:
     Ui::ctp_algo_tradeClass ui;
-  
+    void WriteTxt(QString path, QString data);
+    void WriteTxt(QString path, int flag);
+    void ReadTxt(QString path);
+    void ReadTxt(QString path, int flag);
+    void AddHeyue();
     
 };

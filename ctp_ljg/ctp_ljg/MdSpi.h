@@ -25,7 +25,7 @@ public:
 
 	};
 	MDStruct hq; //สตภýปฏ
-
+	QString dm;
 	void Init();
 signals:
 	void sendData(QString);
@@ -71,7 +71,7 @@ private:
 	void SubscribeMarketData();
 	// 
 	bool IsErrorRspInfo(CThostFtdcRspInfoField* pRspInfo);
-
+	
 	CThostFtdcMdApi* pUserApi;
 
 };
