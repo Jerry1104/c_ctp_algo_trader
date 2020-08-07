@@ -370,7 +370,7 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField* pOrder)
 	}
 	else if (pOrder->OrderStatus == THOST_FTDC_OST_PartTradedQueueing)
 	{
-		zt = QString::fromLocal8Bit("未成交");
+		zt = QString::fromLocal8Bit("部份成交");
 	}
 	else if (pOrder->OrderStatus == THOST_FTDC_OST_PartTradedNotQueueing)
 	{
@@ -383,6 +383,9 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField* pOrder)
 	else if (pOrder->OrderStatus == THOST_FTDC_OST_Canceled)
 	{
 		zt = QString::fromLocal8Bit("已撤单");
+	}
+	else {
+		return;
 	}
 	QString wttime = pOrder->InsertTime; //委托时间
 	QString dm = pOrder->InstrumentID; //委托代码

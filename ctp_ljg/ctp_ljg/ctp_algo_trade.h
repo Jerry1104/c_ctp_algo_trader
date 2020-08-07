@@ -51,5 +51,6 @@ private:
     void ReadTxt(QString path);
     void ReadTxt(QString path, int flag);
     void AddHeyue();
-    
+    void kc(int);
+    void pc(int);
 };

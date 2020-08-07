@@ -828,7 +828,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton">
+   <widget class="QRadioButton" name="radiorun">
     <property name="geometry">
      <rect>
       <x>86</x>
@@ -884,7 +884,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_2">
+   <widget class="QRadioButton" name="radiostop">
     <property name="geometry">
      <rect>
       <x>86</x>
@@ -960,6 +960,19 @@
     </property>
     <property name="text">
      <string>监控代码:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelzt">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>860</y>
+      <width>54</width>
+      <height>12</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>未开仓</string>
     </property>
    </widget>
   </widget>

@@ -12,6 +12,8 @@
 #include <atlstr.h>
 #include <QFile>
 #include <QTextStream>
+#include <QTime>
+#include <QDebug>
 
 using namespace std;
 extern QString hyarray[2000][4];
@@ -35,12 +37,11 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     connect(td, SIGNAL(sendZJ(QString)), this, SLOT(ReceiveZJ(QString)));
     connect(td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveAutoCC(QString)));
     connect(td, SIGNAL(sendHY(QString)), this, SLOT(ReceiveHY(QString)));
+    connect(td, SIGNAL(sendZJ(QString)), this, SLOT(ReceiveAutoZJ(QString)));
     connect(ui.POrder_Button, SIGNAL(clicked()), this, SLOT(xd()));
 
 
     connect(ui.Btnxml, SIGNAL(clicked()), this, SLOT(Onxml()));
-
-
 
     /**
     行情表
@@ -346,7 +347,9 @@ void ctp_algo_trade::ReceiveAutoHQ(QString TICK)
     {
         if (ui.DayTable->item(i, 0)->text() == strlist.at(0))
         {
-
+            //自动下单
+            kc(i);
+            pc(i);
             ui.DayTable->setItem(i, 1, new QTableWidgetItem(strlist.at(1)));	  //更新时间
             ui.DayTable->setItem(i, 9, new QTableWidgetItem(strlist.at(11)));
             ui.DayTable->setItem(i, 10, new QTableWidgetItem(strlist.at(3)));	  //买一价
@@ -844,3 +847,98 @@ void ctp_algo_trade::OnExit()
 
 }
 
+
+bool pctime(QString fwqtime, QString sztime)
+{
+    QDateTime fwq = QDateTime::fromString(fwqtime, "hh:mm:ss");
+    QDateTime sz = QDateTime::fromString(sztime, "hh:mm:ss");
+    if (fwq > sz)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+//开仓
+void ctp_algo_trade::kc(int i)
+{
+
+    if (ui.radiorun->isChecked() == false) return;
+    QString fwtime = ui.DayTable->item(i, 1)->text();
+    QString sztime = ui.DayTable->item(i, 6)->text();
+    if (pctime(fwtime, sztime) == true)	 //更新时间大于开仓时间则返回
+    {
+        return;
+    }
+
+    QString dm = ui.DayTable->item(i, 0)->text();
+    if (ui.DayTable->item(i, 9) == NULL || ui.DayTable->item(i, 12) == NULL)
+    {
+        return;
+    }
+    int vol = 0;
+    if (ui.DayTable->item(i, 4) != NULL)vol = ui.DayTable->item(i, 4)->text().toInt();
+    if (vol > 0)return;
+    if (ui.labelzt->text() == QString::fromLocal8Bit("已开仓"))return;
+    double openprice = ui.DayTable->item(i, 9)->text().toDouble();
+    double lastprice = ui.DayTable->item(i, 12)->text().toDouble();
+    double buyprice = ui.DayTable->item(i, 10)->text().toDouble();
+    double selltprice = ui.DayTable->item(i, 11)->text().toDouble();
+
+    if (lastprice > openprice)
+    {
+        td->ReqOrderInsert(dm, "kd", 1, selltprice);
+        ui.labelzt->setText(QString::fromLocal8Bit("已开仓"));
+
+    }
+    if (lastprice < openprice)
+    {
+        td->ReqOrderInsert(dm, "kk", 1, buyprice);
+        ui.labelzt->setText(QString::fromLocal8Bit("已开仓"));
+    }
+
+}
+//平仓
+void ctp_algo_trade::pc(int i)
+{
+    if (ui.radiorun->isChecked() == false)return;	  //没有开仓,返回
+    if (ui.DayTable->item(i, 4) == NULL)return;		  //判断仓位为空则退出
+    QString dm = ui.DayTable->item(i, 0)->text();
+    int vol = 0;
+    if (ui.DayTable->item(i, 4) != NULL)vol = ui.DayTable->item(i, 4)->text().toInt();
+    if (vol == 0)return;  //手数为0也返回
+    QString fwqtime = ui.DayTable->item(i, 1)->text().trimmed();
+    QString sztime = ui.DayTable->item(i, 6)->text().trimmed();
+    QString cclx = ui.DayTable->item(i, 3)->text().trimmed();	//根据持仓类型才能判断平仓
+    double openprice = ui.DayTable->item(i, 9)->text().toDouble();
+    double lastprice = ui.DayTable->item(i, 12)->text().toDouble();
+    double buyprice = ui.DayTable->item(i, 10)->text().toDouble();
+    double selltprice = ui.DayTable->item(i, 11)->text().toDouble();
+
+    //价格平仓
+    if (vol >= 1 && cclx == "买" && lastprice < openprice)
+    {
+        td->ReqOrderInsert(dm, "pd", vol, buyprice);
+    }
+    if (vol >= 1 && cclx == "卖" && lastprice > openprice)
+    {
+        td->ReqOrderInsert(dm, "pk", vol, selltprice);
+    }
+    //时间平仓
+    if (pctime(fwqtime, sztime) == true)
+    {
+        if (vol > 0 && cclx == QString::fromLocal8Bit("买"))
+        {
+            td->ReqOrderInsert(dm, "pd", vol, buyprice);
+            vol = 0;
+        }
+        if (vol > 0 && cclx == QString::fromLocal8Bit("卖"))
+        {
+            td->ReqOrderInsert(dm, "pk", vol, selltprice);
+            vol = 0;
+        }
+    }
+}
