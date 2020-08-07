@@ -206,10 +206,9 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     //整行选中
     ui.DayTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     //禁止编辑
-    ui.DayTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+   // ui.DayTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     ReadTxt("pz.txt", 0);
-
 
 
 
@@ -270,7 +269,7 @@ void ctp_algo_trade::MDLogin()
 void ctp_algo_trade::ReceiveHQ(QString TICK)
 {
     QStringList  strlist = TICK.split(",");	   //接收StringList数据
-   
+   //  WriteTxt(strlist.at(0) + ".txt", TICK);  //把接收的行情写到本地
     if (strlist.at(0) == ui.EditDm->text())
     {
         ui.labelAsk->setText(strlist.at(5));
@@ -331,16 +330,7 @@ int hy(QString dm)
 void ctp_algo_trade::ReceiveAutoHQ(QString TICK)
 {
     QStringList  strlist = TICK.split(",");	   //接收StringList数据
-  //  WriteTxt(strlist.at(0) + ".txt", TICK);
-
-   /* if (strlist.at(0) == ui.EditDm->text())
-    {
-        ui.labelAsk->setText(strlist.at(5));
-        ui.labelLast->setText(strlist.at(2));
-        ui.labelBid->setText(strlist.at(3));
-        ui.labelUp->setText(strlist.at(9));
-        ui.labelDown->setText(strlist.at(10));
-    }*/
+  
 
     //循环传入的数据
     for (int i = 0; i < ui.DayTable->rowCount(); i++)   //以 HQTable数量为边界
@@ -350,6 +340,7 @@ void ctp_algo_trade::ReceiveAutoHQ(QString TICK)
             //自动下单
             kc(i);
             pc(i);
+
             ui.DayTable->setItem(i, 1, new QTableWidgetItem(strlist.at(1)));	  //更新时间
             ui.DayTable->setItem(i, 9, new QTableWidgetItem(strlist.at(11)));
             ui.DayTable->setItem(i, 10, new QTableWidgetItem(strlist.at(3)));	  //买一价
@@ -908,7 +899,9 @@ void ctp_algo_trade::pc(int i)
     if (ui.DayTable->item(i, 4) == NULL)return;		  //判断仓位为空则退出
     QString dm = ui.DayTable->item(i, 0)->text();
     int vol = 0;
-    if (ui.DayTable->item(i, 4) != NULL)vol = ui.DayTable->item(i, 4)->text().toInt();
+    if (ui.DayTable->item(i, 4) != NULL) {
+        vol = ui.DayTable->item(i, 4)->text().toInt();
+    }
     if (vol == 0)return;  //手数为0也返回
     QString fwqtime = ui.DayTable->item(i, 1)->text().trimmed();
     QString sztime = ui.DayTable->item(i, 6)->text().trimmed();

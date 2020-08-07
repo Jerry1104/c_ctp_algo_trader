@@ -187,7 +187,7 @@ void TdSpi::ReqQryInvestorPosition()
 void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* pInvestorPosition, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (pInvestorPosition == NULL)return;
-	//if (pInvestorPosition->Position==0)return;
+	if (pInvestorPosition->Position==0)return;
 	QString dm = pInvestorPosition->InstrumentID; //持仓代码
 	QString lx = pInvestorPosition->PosiDirection; //持仓多空方向
 	int lots = pInvestorPosition->Position; //持仓,一般用今仓
