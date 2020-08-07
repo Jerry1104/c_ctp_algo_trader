@@ -162,6 +162,7 @@ void TdSpi::OnRspQryTradingAccount(CThostFtdcTradingAccountField* pTradingAccoun
 	QString ZJData = account + "," + QString("%1").arg(zqy, 0, 'f', 2) + "," + QString::number(bzj) + "," + QString::number(kyzj) + "," + QString::number(fxd);
 	emit sendZJ(ZJData);
 
+
 	if (bIsLast && !IsErrorRspInfo(pRspInfo))
 	{
 		///请求查询投资者持仓
