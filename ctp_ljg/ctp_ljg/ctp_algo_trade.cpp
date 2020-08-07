@@ -17,6 +17,7 @@
 
 using namespace std;
 extern QString hyarray[2000][4];
+double ksbl = 0;
 ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     : QMainWindow(parent)
 {
@@ -492,7 +493,7 @@ void ctp_algo_trade::ReceiveAutoCC(QString CCData)
         }
     }
 }
-
+//资金数据接收方法,更新至资金表
 void ctp_algo_trade::ReceiveZJ(QString ZJData)
 {
     QStringList  strlist = ZJData.split(",");	   //接收StringList数据
@@ -510,16 +511,11 @@ void ctp_algo_trade::ReceiveZJ(QString ZJData)
 void ctp_algo_trade::ReceiveAutoZJ(QString ZJData)
 {
     QStringList  strlist = ZJData.split(",");	   //接收StringList数据
-    for (int i = 0; i < ui.DayTable->rowCount(); i++)
-    {
-        if (ui.DayTable->item(i, 0)->text() == strlist.at(0))
-        {
-
-            ui.DayTable->setItem(i, 2, new QTableWidgetItem(strlist.at(2)));
-            ui.DayTable->setItem(i, 3, new QTableWidgetItem(strlist.at(3)));
-            ui.DayTable->setItem(i, 4, new QTableWidgetItem(strlist.at(4)));
-        }
-    }
+    QString	yk = strlist.at(4);
+    QString ykbfb = strlist.at(5);
+    ui.labelyk->setText(yk);
+    ui.labelykbfb->setText(ykbfb);
+    ksbl = ykbfb.toDouble();
 }
 
 
@@ -629,6 +625,7 @@ void ctp_algo_trade::cd()
     QString brokerid = ui.BIDEdit->text();
 
     td->ReqOrderAction(brokerid, wth, jsy); //调报单接口
+   // QMessageBox::information(this, "", QString::fromLocal8Bit("已撤单"));
    // QMessageBox::information(this, "", wth + "," + jsy + "," + brokerid);
 }
 
@@ -860,6 +857,7 @@ void ctp_algo_trade::kc(int i)
     if (ui.radiorun->isChecked() == false) return;
     QString fwtime = ui.DayTable->item(i, 1)->text();
     QString sztime = ui.DayTable->item(i, 6)->text();
+    QString  ksbfb = ui.DayTable->item(i, 8)->text();	 //8表示第8格的亏损比例
     if (pctime(fwtime, sztime) == true)	 //更新时间大于开仓时间则返回
     {
         return;
@@ -920,8 +918,12 @@ void ctp_algo_trade::pc(int i)
     {
         td->ReqOrderInsert(dm, "pk", vol, selltprice);
     }
+
+    //超过亏损平仓
+    QString ksbfb = ui.DayTable->item(i, 8)->text();
+
     //时间平仓
-    if (pctime(fwqtime, sztime) == true)
+    if (pctime(fwqtime, sztime) == true || ksbl > ksbfb.toDouble())
     {
         if (vol > 0 && cclx == QString::fromLocal8Bit("买"))
         {

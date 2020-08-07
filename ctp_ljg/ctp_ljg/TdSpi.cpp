@@ -157,11 +157,14 @@ void TdSpi::OnRspQryTradingAccount(CThostFtdcTradingAccountField* pTradingAccoun
 	double zqy = pTradingAccount->Balance;	//总权益
 	double bzj = pTradingAccount->CurrMargin; //占用保证金
 	double kyzj = pTradingAccount->Available;	//可用资金
+	double starqy = pTradingAccount->PreBalance;
 	double fxd = bzj * 100 / zqy;
+	double yk = zqy - starqy; //盈亏
+	double ykbfb = (zqy - starqy) * 100 / starqy;
 
-	QString ZJData = account + "," + QString("%1").arg(zqy, 0, 'f', 2) + "," + QString::number(bzj) + "," + QString::number(kyzj) + "," + QString::number(fxd);
+	//QString ZJData = account+","+QString("%1").arg(zqy,0,'f',2)+","+QString::number(bzj)+","+QString::number(kyzj)+","+QString::number(fxd)+","+yk;
+	QString ZJData = account + "," + QString("%1").arg(zqy, 0, 'f', 2) + "," + QString::number(bzj) + "," + QString::number(kyzj) + "," + QString::number(fxd) + QString::number(yk) + "," + QString("%1").arg(ykbfb, 0, 'f', 2);
 	emit sendZJ(ZJData);
-
 
 	if (bIsLast && !IsErrorRspInfo(pRspInfo))
 	{

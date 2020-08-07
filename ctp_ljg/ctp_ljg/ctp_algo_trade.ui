@@ -647,7 +647,7 @@
         <x>0</x>
         <y>0</y>
         <width>941</width>
-        <height>821</height>
+        <height>801</height>
        </rect>
       </property>
      </widget>
@@ -789,7 +789,7 @@
    <widget class="QRadioButton" name="radiorun">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>40</x>
       <y>840</y>
       <width>111</width>
       <height>16</height>
@@ -812,8 +812,8 @@
    <widget class="QLabel" name="label_17">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>880</y>
+      <x>180</x>
+      <y>870</y>
       <width>54</width>
       <height>12</height>
      </rect>
@@ -845,8 +845,8 @@
    <widget class="QRadioButton" name="radiostop">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>880</y>
+      <x>40</x>
+      <y>870</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -923,14 +923,53 @@
    <widget class="QLabel" name="labelzt">
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>850</y>
+      <x>170</x>
+      <y>840</y>
       <width>54</width>
       <height>12</height>
      </rect>
     </property>
     <property name="text">
      <string>未开仓</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelykbfb">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>840</y>
+      <width>54</width>
+      <height>12</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0.00</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_20">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>840</y>
+      <width>54</width>
+      <height>12</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>%</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelyk">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>870</y>
+      <width>54</width>
+      <height>12</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0.00</string>
     </property>
    </widget>
   </widget>
