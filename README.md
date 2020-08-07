@@ -1,4 +1,9 @@
 ### ctp开发环境： vs + qt5
+###### vs2009 下载地址：https://visualstudio.microsoft.com/zh-hans/thank-you-downloading-visual-studio/?sku=Community&rel=16
+###### qt5 下载地址：http://download.qt.io/archive/qt/5.12/5.12.9/
+###### CTP api 下载： http://www.sfit.com.cn/
+###### simnow 注册模拟账号 http://www.simnow.com.cn/
+
 
 #### ctp 链接配置
 ###### BrokerID统一为：9999
