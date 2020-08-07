@@ -92,7 +92,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="MdSpi.cpp" />
+    <ClCompile Include="MdThread.cpp" />
     <ClCompile Include="TdSpi.cpp" />
+    <ClCompile Include="TdThread.cpp" />
     <ClCompile Include="tinystr.cpp" />
     <ClCompile Include="tinyxml.cpp" />
     <ClCompile Include="tinyxmlerror.cpp" />
@@ -110,6 +112,8 @@
     <QtMoc Include="TdSpi.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="MdThread.h" />
+    <QtMoc Include="TdThread.h" />
     <ClInclude Include="tinystr.h" />
     <ClInclude Include="tinyxml.h" />
   </ItemGroup>

@@ -23,22 +23,22 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
 {
     ui.setupUi(this);
 
-    md = new MdSpi(this);
-    td = new TdSpi(this);
+    md = new MdThread(this);
+    td = new TdThread(this);
     string filename = "config.xml";
     readxml(filename);
 
 
 
-    connect(md, SIGNAL(sendData(QString)), this, SLOT(ReceiveHQ(QString)));
-    connect(md, SIGNAL(sendData(QString)), this, SLOT(ReceiveAutoHQ(QString)));
-    connect(td, SIGNAL(sendCJ(QString)), this, SLOT(ReceiveCJ(QString)));
-    connect(td, SIGNAL(sendWT(QString)), this, SLOT(ReceiveWT(QString)));
-    connect(td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveCC(QString)));
-    connect(td, SIGNAL(sendZJ(QString)), this, SLOT(ReceiveZJ(QString)));
-    connect(td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveAutoCC(QString)));
-    connect(td, SIGNAL(sendHY(QString)), this, SLOT(ReceiveHY(QString)));
-    connect(td, SIGNAL(sendZJ(QString)), this, SLOT(ReceiveAutoZJ(QString)));
+    connect(md->md, SIGNAL(sendData(QString)), this, SLOT(ReceiveHQ(QString)));
+    connect(md->md, SIGNAL(sendData(QString)), this, SLOT(ReceiveAutoHQ(QString)));
+    connect(td->td, SIGNAL(sendCJ(QString)), this, SLOT(ReceiveCJ(QString)));
+    connect(td->td, SIGNAL(sendWT(QString)), this, SLOT(ReceiveWT(QString)));
+    connect(td->td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveCC(QString)));
+    connect(td->td, SIGNAL(sendZJ(QString)), this, SLOT(ReceiveZJ(QString)));
+    connect(td->td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveAutoCC(QString)));
+    connect(td->td, SIGNAL(sendHY(QString)), this, SLOT(ReceiveHY(QString)));
+    connect(td->td, SIGNAL(sendZJ(QString)), this, SLOT(ReceiveAutoZJ(QString)));
     connect(ui.POrder_Button, SIGNAL(clicked()), this, SLOT(xd()));
 
 
@@ -250,7 +250,7 @@ void ctp_algo_trade::MDLogin()
     strcpy(md->hq.AppID, ch7);
     strcpy(md->hq.INVESTOR_ID, ch4);
     
-    md->Init();
+    md->start();
 
 
     //交易登陆
@@ -261,7 +261,7 @@ void ctp_algo_trade::MDLogin()
     strcpy(td->jy.AuthCode, ch6);
     strcpy(td->jy.AppID, ch7);
     strcpy(td->jy.INVESTOR_ID, ch4);
-    td->Init();
+    td->start();
 
 
 }
@@ -600,7 +600,7 @@ void ctp_algo_trade::xd() {
         }
     }
 
-    td->ReqOrderInsert(dm, lx, lots, wtprice);
+    td->td->ReqOrderInsert(dm, lx, lots, wtprice);
 
 
 }
@@ -624,7 +624,7 @@ void ctp_algo_trade::cd()
     QString jsy = ui.WTTable->item(i, 8)->text(); //交易所
     QString brokerid = ui.BIDEdit->text();
 
-    td->ReqOrderAction(brokerid, wth, jsy); //调报单接口
+    td->td->ReqOrderAction(brokerid, wth, jsy); //调报单接口
    // QMessageBox::information(this, "", QString::fromLocal8Bit("已撤单"));
    // QMessageBox::information(this, "", wth + "," + jsy + "," + brokerid);
 }
@@ -809,7 +809,7 @@ void ctp_algo_trade::ReadTxt(QString path, int flag)
             ui.DayTable->setItem(row, 7, new QTableWidgetItem(strlist.at(2)));
             ui.DayTable->setItem(row, 8, new QTableWidgetItem(strlist.at(3)));
             strdm.append(strlist.at(0));
-            md->dm = strdm.join(",");
+            md->md->dm = strdm.join(",");
 
         }
     }
@@ -879,13 +879,13 @@ void ctp_algo_trade::kc(int i)
 
     if (lastprice > openprice)
     {
-        td->ReqOrderInsert(dm, "kd", 1, selltprice);
+        td->td->ReqOrderInsert(dm, "kd", 1, selltprice);
         ui.labelzt->setText(QString::fromLocal8Bit("已开仓"));
 
     }
     if (lastprice < openprice)
     {
-        td->ReqOrderInsert(dm, "kk", 1, buyprice);
+        td->td->ReqOrderInsert(dm, "kk", 1, buyprice);
         ui.labelzt->setText(QString::fromLocal8Bit("已开仓"));
     }
 
@@ -912,11 +912,11 @@ void ctp_algo_trade::pc(int i)
     //价格平仓
     if (vol >= 1 && cclx == "买" && lastprice < openprice)
     {
-        td->ReqOrderInsert(dm, "pd", vol, buyprice);
+        td->td->ReqOrderInsert(dm, "pd", vol, buyprice);
     }
     if (vol >= 1 && cclx == "卖" && lastprice > openprice)
     {
-        td->ReqOrderInsert(dm, "pk", vol, selltprice);
+        td->td->ReqOrderInsert(dm, "pk", vol, selltprice);
     }
 
     //超过亏损平仓
@@ -927,12 +927,12 @@ void ctp_algo_trade::pc(int i)
     {
         if (vol > 0 && cclx == QString::fromLocal8Bit("买"))
         {
-            td->ReqOrderInsert(dm, "pd", vol, buyprice);
+            td->td->ReqOrderInsert(dm, "pd", vol, buyprice);
             vol = 0;
         }
         if (vol > 0 && cclx == QString::fromLocal8Bit("卖"))
         {
-            td->ReqOrderInsert(dm, "pk", vol, selltprice);
+            td->td->ReqOrderInsert(dm, "pk", vol, selltprice);
             vol = 0;
         }
     }

@@ -59,12 +59,24 @@
     <ClCompile Include="tinyxmlparser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MdThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TdThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="MdSpi.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="TdSpi.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="MdThread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="TdThread.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

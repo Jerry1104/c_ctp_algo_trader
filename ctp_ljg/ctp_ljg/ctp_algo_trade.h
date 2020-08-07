@@ -4,8 +4,7 @@
 #include "ui_ctp_algo_trade.h"
 #include "ThostFtdcMdApi.h"
 #include "ThostFtdcTraderApi.h"
-#include "MdSpi.h"
-#include "TdSpi.h"
+
 #include "tinystr.h"
 #include "tinyxml.h"
 #include <string>
@@ -13,6 +12,8 @@
 #include <iostream>
 #include <windows.h>
 #include <atlstr.h>	  //Cstring函数头文件
+#include "Mdthread.h"
+#include "Tdthread.h"
 using namespace std;
 class ctp_algo_trade : public QMainWindow
 {
@@ -21,8 +22,8 @@ class ctp_algo_trade : public QMainWindow
 public:
     ctp_algo_trade(QWidget *parent = Q_NULLPTR);
     ~ctp_algo_trade();
-    MdSpi* md;
-    TdSpi* td;
+    MdThread* md;
+    TdThread* td;
 
 private slots:
     void MDLogin();
