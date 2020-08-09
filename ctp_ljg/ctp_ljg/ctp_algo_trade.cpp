@@ -170,15 +170,13 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     ui.radioSJ->setChecked(true);
     ui.radioPJ->setChecked(true);
 
-    ui.EditDm->setText("cu2009");
-    ui.EditLots->setText("1");
+    ui.EditDm->setText("");
+    ui.EditLots->setText("");
 
     //////////////右键菜单
     ui.WTTable->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui.WTTable, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnWTMenu(const QPoint&)));
     connect(ui.actioncd, SIGNAL(triggered()), this, SLOT(cd()));
-
-
 
 
     /////////////////////////////全自动交易模块开始/////////////////////////////////////////////
@@ -209,7 +207,7 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     //禁止编辑
    // ui.DayTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    ReadTxt("pz.txt", 0);
+    ReadTxt("fxData/pz.txt", 0); //风险防控文件
 
 
 
@@ -270,7 +268,7 @@ void ctp_algo_trade::MDLogin()
 void ctp_algo_trade::ReceiveHQ(QString TICK)
 {
     QStringList  strlist = TICK.split(",");	   //接收StringList数据
-   //  WriteTxt(strlist.at(0) + ".txt", TICK);  //把接收的行情写到本地
+     WriteTxt("hqTickData/"+strlist.at(0) + ".txt", TICK);  //把接收的行情写到本地
     if (strlist.at(0) == ui.EditDm->text())
     {
         ui.labelAsk->setText(strlist.at(5));
@@ -647,11 +645,16 @@ bool ctp_algo_trade::writexml(string& szFileName)
         TiXmlElement* TDElement = new TiXmlElement("交易地址");
         TiXmlElement* BIDElement = new TiXmlElement("BrokerID");
         TiXmlElement* ACCOUNTElement = new TiXmlElement("帐号");
+        TiXmlElement* AuthCodeElement = new TiXmlElement("AuthCode");
+        TiXmlElement* AppIDElement = new TiXmlElement("AppID");
+
 
         PersonElement->LinkEndChild(MDElement);
         PersonElement->LinkEndChild(TDElement);
         PersonElement->LinkEndChild(BIDElement);
         PersonElement->LinkEndChild(ACCOUNTElement);  //创建子元素并连接
+        PersonElement->LinkEndChild(AuthCodeElement);  
+        PersonElement->LinkEndChild(AppIDElement);  
 
         QByteArray xmlmd = ui.MDEdit->text().toLatin1();
         const char* md = xmlmd.data();	  //把QString 转化成char类型
@@ -661,16 +664,25 @@ bool ctp_algo_trade::writexml(string& szFileName)
         const char* bid = xmlbid.data();
         QByteArray xmlaccount = ui.UserEdit->text().toLatin1();
         const char* account = xmlaccount.data();
+        QByteArray xmlAuthCode = ui.AuthCodeEdit->text().toLatin1();
+        const char* authCode = xmlAuthCode.data();
+        QByteArray xmlAppID = ui.AppIDEdit->text().toLatin1();
+        const char* appID = xmlAppID.data();
+
 
         TiXmlText* MDContent = new TiXmlText(md);
         TiXmlText* TDContext = new TiXmlText(td);
         TiXmlText* BIDContext = new TiXmlText(bid);
         TiXmlText* ACCOUNTContext = new TiXmlText(account);
+        TiXmlText* AuthCodeContext = new TiXmlText(authCode);
+        TiXmlText* AppIDContext = new TiXmlText(appID);
 
         MDElement->LinkEndChild(MDContent);
         TDElement->LinkEndChild(TDContext);
         BIDElement->LinkEndChild(BIDContext);
         ACCOUNTElement->LinkEndChild(ACCOUNTContext);
+        AuthCodeElement->LinkEndChild(AuthCodeContext);
+        AppIDElement->LinkEndChild(AppIDContext);
 
 
         CString appPath = GetAppPath();
@@ -740,7 +752,7 @@ bool ctp_algo_trade::readxml(string& szFileName)
 
 ctp_algo_trade::~ctp_algo_trade()
 {
-    WriteTxt("pz.txt", 0);
+    WriteTxt("fxData/pz.txt", 0);
 }
 
 void ctp_algo_trade::WriteTxt(QString path, QString data)

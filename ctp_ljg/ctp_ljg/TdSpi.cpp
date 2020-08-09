@@ -92,7 +92,7 @@ void TdSpi::ReqSettlementInfoConfirm()
 	int iResult = pUserApi->ReqSettlementInfoConfirm(&req, ++iRequestID);
 	cerr << "--->>> 投资者结算结果确认: " << ((iResult == 0) ? "成功" : "失败") << endl;
 }
-
+//投资者结算结果确认响应
 void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField* pSettlementInfoConfirm, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 	cerr << "--->>> " << "OnRspSettlementInfoConfirm" << endl;
