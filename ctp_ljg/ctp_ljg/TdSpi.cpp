@@ -423,6 +423,7 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField* pTrade)
 
 	emit sendCJ(CJData);
 	//成交完成后调持仓查询
+	//Sleep(2000);
 	//ReqQryInvestorPosition();
 }
 

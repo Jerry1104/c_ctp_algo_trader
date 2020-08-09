@@ -27,20 +27,24 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     td = new TdThread(this);
     string filename = "config.xml";
     readxml(filename);
-
+   // ReadTxt("cu2009.txt");
 
     connect(md->md, SIGNAL(sendData(QString)), this, SLOT(ReceiveHQ(QString)));
     connect(md->md, SIGNAL(sendData(QString)), this, SLOT(ReceiveAutoHQ(QString)));
+    
     connect(td->td, SIGNAL(sendCJ(QString)), this, SLOT(ReceiveCJ(QString)));
     connect(td->td, SIGNAL(sendWT(QString)), this, SLOT(ReceiveWT(QString)));
-    connect(td->td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveCC(QString)));
-    connect(td->td, SIGNAL(sendZJ(QString)), this, SLOT(ReceiveZJ(QString)));
-    connect(td->td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveAutoCC(QString)));
     connect(td->td, SIGNAL(sendHY(QString)), this, SLOT(ReceiveHY(QString)));
+
+    connect(td->td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveCC(QString)));
+    connect(td->td, SIGNAL(sendCC(QString)), this, SLOT(ReceiveAutoCC(QString)));
+
+    connect(td->td, SIGNAL(sendZJ(QString)), this, SLOT(ReceiveZJ(QString)));
     connect(td->td, SIGNAL(sendZJ(QString)), this, SLOT(ReceiveAutoZJ(QString)));
+    //下单按钮
     connect(ui.POrder_Button, SIGNAL(clicked()), this, SLOT(xd()));
 
-
+    //退出时把登录信息记录到xml
     connect(ui.Btnxml, SIGNAL(clicked()), this, SLOT(Onxml()));
 
     /**
@@ -162,15 +166,15 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     ui.UserEdit->setText("137829");*/
     ui.PWEdit->setEchoMode(QLineEdit::Password);
     ui.PWEdit->setText("");
-    ui.AuthCodeEdit->setText("0000000000000000");
-    ui.AppIDEdit->setText("simnow_client_test");
+   // ui.AuthCodeEdit->setText("0000000000000000");
+  //  ui.AppIDEdit->setText("simnow_client_test");
 
     //设置平今仓/市价的radio为选中
-    ui.radioSJ->setChecked(true);
-    ui.radioPJ->setChecked(true);
+    ui.radioSJ->setChecked(true); //平今仓
+    ui.radioPJ->setChecked(true);//平昨仓
 
-    ui.EditDm->setText("");
-    ui.EditLots->setText("");
+    ui.EditDm->setText(""); //下单合约
+    ui.EditLots->setText("");//下单数量
 
     //////////////右键菜单
     ui.WTTable->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -210,6 +214,11 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
 
 
 
+}
+
+ctp_algo_trade::~ctp_algo_trade()
+{
+    WriteTxt("fxData/pz.txt", 0);
 }
 
 
@@ -333,12 +342,11 @@ void ctp_algo_trade::ReceiveAutoHQ(QString TICK)
     //循环传入的数据
     for (int i = 0; i < ui.DayTable->rowCount(); i++)   //以 HQTable数量为边界
     {
+        //自动下单
+        kc(i);
+        pc(i);
         if (ui.DayTable->item(i, 0)->text() == strlist.at(0))
         {
-            //自动下单
-            kc(i);
-            pc(i);
-
             ui.DayTable->setItem(i, 1, new QTableWidgetItem(strlist.at(1)));	  //更新时间
             ui.DayTable->setItem(i, 9, new QTableWidgetItem(strlist.at(11)));
             ui.DayTable->setItem(i, 10, new QTableWidgetItem(strlist.at(3)));	  //买一价
@@ -377,7 +385,7 @@ void ctp_algo_trade::ReceiveCJ(QString CJData)
     {
         openclose = QString::fromLocal8Bit("平昨");
     }
-    else if (strlist.at(3) == "3")
+    else //if (strlist.at(3) == "3")
     {
         openclose = QString::fromLocal8Bit("平今");
     }
@@ -502,6 +510,11 @@ void ctp_algo_trade::ReceiveZJ(QString ZJData)
     ui.ZJTable->setItem(row, 2, new QTableWidgetItem(strlist.at(2)));
     ui.ZJTable->setItem(row, 3, new QTableWidgetItem(strlist.at(3)));
     ui.ZJTable->setItem(row, 4, new QTableWidgetItem(strlist.at(4)));
+
+    QString yk = strlist.at(4);
+    QString ykbfb = strlist.at(5);
+    ui.labelyk->setText(yk);
+    ui.labelykbfb->setText(ykbfb);
 }
 
 
@@ -510,6 +523,7 @@ void ctp_algo_trade::ReceiveAutoZJ(QString ZJData)
     QStringList  strlist = ZJData.split(",");	   //接收StringList数据
     QString	yk = strlist.at(4);
     QString ykbfb = strlist.at(5);
+
     ui.labelyk->setText(yk);
     ui.labelykbfb->setText(ykbfb);
     ksbl = ykbfb.toDouble();
@@ -754,11 +768,6 @@ bool ctp_algo_trade::readxml(string& szFileName)
     return true;
 }
 
-
-ctp_algo_trade::~ctp_algo_trade()
-{
-    WriteTxt("fxData/pz.txt", 0);
-}
 
 void ctp_algo_trade::WriteTxt(QString path, QString data)
 {
