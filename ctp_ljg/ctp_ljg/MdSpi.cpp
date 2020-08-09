@@ -67,7 +67,7 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin,
 		cerr << "--->>> 获取当前交易日 = " << pUserApi->GetTradingDay() << endl;
 		// 请求订阅行情
 		SubscribeMarketData();
-		SubscribeMarketData(dm);  //
+		//SubscribeMarketData(dm);  //
 	}
 }
 

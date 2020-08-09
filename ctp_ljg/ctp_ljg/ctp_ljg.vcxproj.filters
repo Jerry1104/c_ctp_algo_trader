@@ -100,4 +100,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="config.xml">
+      <Filter>Header Files</Filter>
+    </Xml>
+  </ItemGroup>
 </Project>

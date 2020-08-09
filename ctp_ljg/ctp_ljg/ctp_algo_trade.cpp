@@ -166,8 +166,8 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     ui.UserEdit->setText("137829");*/
     ui.PWEdit->setEchoMode(QLineEdit::Password);
     ui.PWEdit->setText("");
-   // ui.AuthCodeEdit->setText("0000000000000000");
-  //  ui.AppIDEdit->setText("simnow_client_test");
+    //ui.AuthCodeEdit->setText("0000000000000000");
+    //ui.AppIDEdit->setText("simnow_client_test");
 
     //设置平今仓/市价的radio为选中
     ui.radioSJ->setChecked(true); //平今仓
@@ -219,6 +219,90 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
 ctp_algo_trade::~ctp_algo_trade()
 {
     WriteTxt("fxData/pz.txt", 0);
+}
+
+
+
+void ctp_algo_trade::WriteTxt(QString path, QString data)
+{
+    QFile mydata(path);
+    if (mydata.open(QFile::WriteOnly | QIODevice::Append))
+    {
+        QTextStream out(&mydata);
+        out << data + "\n";
+    }
+}
+
+void ctp_algo_trade::WriteTxt(QString path, int flag)
+{
+    QFile mydata(path);
+    if (mydata.open(QFile::WriteOnly | QIODevice::Truncate)) //覆盖原有数据
+    {
+        QTextStream out(&mydata);
+        for (int i = 0; i < ui.DayTable->rowCount(); i++)
+        {
+            QString dm = ui.DayTable->item(i, 0)->text();  //取代码的数据
+            QString pctime = ui.DayTable->item(i, 6)->text();
+            QString bzj = ui.DayTable->item(i, 7)->text();
+            QString loss = ui.DayTable->item(i, 8)->text();
+
+            out << dm + "," + pctime + "," + bzj + "," + loss + "\r\n";
+
+
+        }
+        mydata.close();
+    }
+}
+
+
+void ctp_algo_trade::ReadTxt(QString path)
+{
+    QFile file(path);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        while (!file.atEnd()) //没到最后一直读下去
+        {
+            QByteArray line = file.readLine();
+            QString str(line);
+            ui.textEdit->append(str);
+        }
+    }
+}
+
+void ctp_algo_trade::ReadTxt(QString path, int flag)
+{
+    QFile file(path);
+    QStringList strdm;	 //代码list结构
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        while (!file.atEnd())
+        {
+            QByteArray line = file.readLine();
+            QString str(line);
+            //过滤txt末尾为空
+            if (str.trimmed() == "") continue;
+            QStringList strlist = str.split(",");
+            int row = ui.DayTable->rowCount();
+            ui.DayTable->insertRow(row);
+            ui.DayTable->setItem(row, 0, new QTableWidgetItem(strlist.at(0)));
+            ui.DayTable->setItem(row, 6, new QTableWidgetItem(strlist.at(1)));
+            ui.DayTable->setItem(row, 7, new QTableWidgetItem(strlist.at(2)));
+            ui.DayTable->setItem(row, 8, new QTableWidgetItem(strlist.at(3)));
+            strdm.append(strlist.at(0));
+            md->md->dm = strdm.join(",");
+
+        }
+    }
+}
+//配置风险
+void ctp_algo_trade::AddHeyue()
+{
+    int row = ui.DayTable->rowCount();
+    ui.DayTable->insertRow(row);
+    ui.DayTable->setItem(row, 0, new QTableWidgetItem(ui.lineEditdm->text()));
+    ui.DayTable->setItem(row, 6, new QTableWidgetItem(ui.lineEditpctime->text()));
+    ui.DayTable->setItem(row, 7, new QTableWidgetItem(ui.lineEditbzj->text()));
+    ui.DayTable->setItem(row, 8, new QTableWidgetItem(ui.lineEditloss->text()));
 }
 
 
@@ -758,8 +842,8 @@ bool ctp_algo_trade::readxml(string& szFileName)
         ui.TDEdit->setText(td);
         ui.BIDEdit->setText(bid);
         ui.UserEdit->setText(account);
-        ui.AuthCodeEdit->setText(account);
-        ui.AppIDEdit->setText(account);
+        ui.AuthCodeEdit->setText(authCode);
+        ui.AppIDEdit->setText(appID);
     }
     catch (string& e)
     {
@@ -769,87 +853,6 @@ bool ctp_algo_trade::readxml(string& szFileName)
 }
 
 
-void ctp_algo_trade::WriteTxt(QString path, QString data)
-{
-    QFile mydata(path);
-    if (mydata.open(QFile::WriteOnly | QIODevice::Append))
-    {
-        QTextStream out(&mydata);
-        out << data + "\n";
-    }
-}
-
-void ctp_algo_trade::WriteTxt(QString path, int flag)
-{
-    QFile mydata(path);
-    if (mydata.open(QFile::WriteOnly | QIODevice::Truncate)) //覆盖原有数据
-    {
-        QTextStream out(&mydata);
-        for (int i = 0; i < ui.DayTable->rowCount(); i++)
-        {
-            QString dm = ui.DayTable->item(i, 0)->text();  //取代码的数据
-            QString pctime = ui.DayTable->item(i, 6)->text();
-            QString bzj = ui.DayTable->item(i, 7)->text();
-            QString loss = ui.DayTable->item(i, 8)->text();
-
-            out << dm + "," + pctime + "," + bzj + "," + loss + "\r\n";
-
-
-        }
-        mydata.close();
-    }
-}
-
-
-void ctp_algo_trade::ReadTxt(QString path)
-{
-    QFile file(path);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        while (!file.atEnd()) //没到最后一直读下去
-        {
-            QByteArray line = file.readLine();
-            QString str(line);
-            ui.textEdit->append(str);
-        }
-    }
-}
-
-void ctp_algo_trade::ReadTxt(QString path, int flag)
-{
-    QFile file(path);
-    QStringList strdm;	 //代码list结构
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        while (!file.atEnd())
-        {
-            QByteArray line = file.readLine();
-            QString str(line);
-            //过滤txt末尾为空
-            if (str.trimmed() == "") continue;
-            QStringList strlist = str.split(",");
-            int row = ui.DayTable->rowCount();
-            ui.DayTable->insertRow(row);
-            ui.DayTable->setItem(row, 0, new QTableWidgetItem(strlist.at(0)));
-            ui.DayTable->setItem(row, 6, new QTableWidgetItem(strlist.at(1)));
-            ui.DayTable->setItem(row, 7, new QTableWidgetItem(strlist.at(2)));
-            ui.DayTable->setItem(row, 8, new QTableWidgetItem(strlist.at(3)));
-            strdm.append(strlist.at(0));
-            md->md->dm = strdm.join(",");
-
-        }
-    }
-}
-//配置风险
-void ctp_algo_trade::AddHeyue()
-{
-    int row = ui.DayTable->rowCount();
-    ui.DayTable->insertRow(row);
-    ui.DayTable->setItem(row, 0, new QTableWidgetItem(ui.lineEditdm->text()));
-    ui.DayTable->setItem(row, 6, new QTableWidgetItem(ui.lineEditpctime->text()));
-    ui.DayTable->setItem(row, 7, new QTableWidgetItem(ui.lineEditbzj->text()));
-    ui.DayTable->setItem(row, 8, new QTableWidgetItem(ui.lineEditloss->text()));
-}
 
 void ctp_algo_trade::OnAddHeyue()
 {
