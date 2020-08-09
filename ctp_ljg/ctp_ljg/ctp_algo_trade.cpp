@@ -29,7 +29,6 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     readxml(filename);
 
 
-
     connect(md->md, SIGNAL(sendData(QString)), this, SLOT(ReceiveHQ(QString)));
     connect(md->md, SIGNAL(sendData(QString)), this, SLOT(ReceiveAutoHQ(QString)));
     connect(td->td, SIGNAL(sendCJ(QString)), this, SLOT(ReceiveCJ(QString)));
@@ -729,18 +728,24 @@ bool ctp_algo_trade::readxml(string& szFileName)
         TiXmlElement* TDElement = MDElement->NextSiblingElement();
         TiXmlElement* BIDElement = TDElement->NextSiblingElement();	 //顺序获取下一个元素
         TiXmlElement* ACCOUNTElement = BIDElement->NextSiblingElement();
+        TiXmlElement* AuthCodeElement = ACCOUNTElement->NextSiblingElement();
+        TiXmlElement* AppIDElement = AuthCodeElement->NextSiblingElement();
 
         TiXmlAttribute* IDAttribute = FirstPerson->FirstAttribute();
-        QString md, td, bid, account;
+        QString md, td, bid, account, authCode, appID;
         md = MDElement->FirstChild()->Value();
         td = TDElement->FirstChild()->Value();
         bid = BIDElement->FirstChild()->Value();
         account = ACCOUNTElement->FirstChild()->Value();
+        authCode = AuthCodeElement->FirstChild()->Value();
+        appID = AppIDElement->FirstChild()->Value();
 
         ui.MDEdit->setText(md);
         ui.TDEdit->setText(td);
         ui.BIDEdit->setText(bid);
         ui.UserEdit->setText(account);
+        ui.AuthCodeEdit->setText(account);
+        ui.AppIDEdit->setText(account);
     }
     catch (string& e)
     {

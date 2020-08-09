@@ -91,8 +91,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AsyncLog.cpp" />
     <ClCompile Include="MdSpi.cpp" />
     <ClCompile Include="MdThread.cpp" />
+    <ClCompile Include="Platform.cpp" />
     <ClCompile Include="TdSpi.cpp" />
     <ClCompile Include="TdThread.cpp" />
     <ClCompile Include="tinystr.cpp" />
@@ -114,6 +116,8 @@
   <ItemGroup>
     <QtMoc Include="MdThread.h" />
     <QtMoc Include="TdThread.h" />
+    <ClInclude Include="AsyncLog.h" />
+    <ClInclude Include="Platform.h" />
     <ClInclude Include="tinystr.h" />
     <ClInclude Include="tinyxml.h" />
   </ItemGroup>
