@@ -10,6 +10,12 @@ char* ppInstrumentID[] = {"cu2009","au2012","ag2012","al2009","ru2009","rb2010",
 ,"a2009","b2009","c2009" ,"cs2009","i2009","j2009","l2009","m2009" ,"p2009","pp2009","v2009" ,"y2009","eg2009","pg2101",  "rr2009" ,"eb2009"
 ,"MA009" ,"TA009","SR009","CF009" ,"FG009","RM009" ,"OI009","ZC009","CY009",  "CJ2009","SA2009" }; //订阅行情列表
 int  iInstrumentID = 41;//订阅行情个数
+/*
+char* ppInstrumentID[] = { "cu2009" }; //订阅行情列表
+int  iInstrumentID = 1;//订阅行情个数
+*/
+
+
 // 请求编号
 int iRequestID;
 

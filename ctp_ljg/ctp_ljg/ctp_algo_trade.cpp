@@ -27,7 +27,8 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     td = new TdThread(this);
     string filename = "config.xml";
     readxml(filename);
-   // ReadTxt("cu2009.txt");
+     //读取指定文件数据
+    //ReadTxt("TickData/cu2009.txt");
 
     connect(md->md, SIGNAL(sendData(QString)), this, SLOT(ReceiveHQ(QString)));
 
@@ -257,7 +258,7 @@ void ctp_algo_trade::WriteTxt(QString path, int flag)
     }
 }
 
-
+//读取数据
 void ctp_algo_trade::ReadTxt(QString path)
 {
     QFile file(path);
@@ -271,7 +272,7 @@ void ctp_algo_trade::ReadTxt(QString path)
         }
     }
 }
-
+//读取风险配置文件
 void ctp_algo_trade::ReadTxt(QString path, int flag)
 {
     QFile file(path);
@@ -367,6 +368,36 @@ void ctp_algo_trade::ReceiveHQ1(QString TICK)
     QStringList  strlist = TICK.split(",");	   //接收StringList数据
     WriteTxt("TickData/" + strlist.at(1) + ".txt", TICK);  //把接收的行情写到本地
 
+
+      //绘制k线图
+    QCPFinancial* candlesticks = new QCPFinancial(ui.customPlot->xAxis, ui.customPlot->yAxis);
+    QString Keytime;
+    double Open, High, Low, Close;
+    int Vol, k;
+
+    Open = strlist.at(6).toDouble();
+    High = strlist.at(7).toDouble();
+    Low = strlist.at(8).toDouble();
+    Close = strlist.at(2).toDouble();
+    Vol = strlist.at(10).toInt();
+
+    candlesticks->addData(Open, High, Low, Close , Vol);
+
+    //绘制K线
+
+    ui.customPlot->addPlottable(candlesticks);
+    candlesticks->setChartStyle(QCPFinancial::csCandlestick);  //设置蜡烛图 
+    candlesticks->setWidth(k * 0.005);
+    candlesticks->setTwoColored(true);
+    candlesticks->setBrushPositive(QColor(255, 0, 0)); //255,0,0为红色
+    candlesticks->setBrushNegative(QColor(0, 100, 0)); //蓝色
+    candlesticks->setPenPositive(QColor(0, 0, 0));
+    candlesticks->setPenNegative(QColor(0, 0, 0));
+
+    ui.customPlot->rescaleAxes(); //画图
+    ui.customPlot->xAxis->scaleRange(1, Qt::AlignRight); //调整数量,1表示K线的密度,
+    ui.customPlot->setInteraction(QCP::iRangeDrag, true);	 //鼠标拖动	,会出现上下拖动
+    ui.customPlot->axisRect()->setRangeDrag(Qt::Horizontal); //禁用上下拖动
 }
 
 
@@ -374,8 +405,19 @@ void ctp_algo_trade::ReceiveHQ1(QString TICK)
 //接收行情
 void ctp_algo_trade::ReceiveHQ(QString TICK)
 {
+
+
+    //绘制k线图
+   /* QCPFinancial* candlesticks = new QCPFinancial(ui.customPlot->xAxis, ui.customPlot->yAxis);
+    QString Keytime;
+    double Open, High, Low, Close;
+    int Vol, k;
+    */
+
     QStringList  strlist = TICK.split(",");	   //接收StringList数据
     // WriteTxt("hqTickData/"+strlist.at(0) + ".txt", TICK);  //把接收的行情写到本地
+   
+    
     if (strlist.at(0) == ui.EditDm->text())
     {
         ui.labelAsk->setText(strlist.at(5));
@@ -388,6 +430,13 @@ void ctp_algo_trade::ReceiveHQ(QString TICK)
     //循环传入的数据
     for (int i = 0; i < ui.HQTable->rowCount(); i++)   //以 HQTable数量为边界
     {
+
+       /* Open = strlist.at(2).toDouble();
+        High = strlist.at(2).toDouble();
+        Low = strlist.at(2).toDouble();
+        Close = strlist.at(2).toDouble();
+        */
+
         if (ui.HQTable->item(i, 0)->text() == strlist.at(0))
         {
             ui.HQTable->setItem(i, 0, new QTableWidgetItem(strlist.at(0)));	  //更新数据
@@ -403,6 +452,8 @@ void ctp_algo_trade::ReceiveHQ(QString TICK)
             ui.HQTable->setItem(i, 10, new QTableWidgetItem(strlist.at(10)));	  //更新数据
             return;
         }
+
+       // candlesticks->addData(i,Open, High, Low, Close);
     }
     int row = ui.HQTable->rowCount();
     ui.HQTable->insertRow(row);
@@ -417,6 +468,30 @@ void ctp_algo_trade::ReceiveHQ(QString TICK)
     ui.HQTable->setItem(row, 8, new QTableWidgetItem(strlist.at(8)));
     ui.HQTable->setItem(row, 9, new QTableWidgetItem(strlist.at(9)));
     ui.HQTable->setItem(row, 10, new QTableWidgetItem(strlist.at(10)));
+
+
+
+
+
+
+
+    //绘制K线
+    /*
+    ui.customPlot->addPlottable(candlesticks);
+    candlesticks->setChartStyle(QCPFinancial::csCandlestick);  //设置蜡烛图 
+    candlesticks->setWidth(k * 0.005);
+    candlesticks->setTwoColored(true);
+    candlesticks->setBrushPositive(QColor(255, 0, 0)); //255,0,0为红色
+    candlesticks->setBrushNegative(QColor(0, 100, 0)); //蓝色
+    candlesticks->setPenPositive(QColor(0, 0, 0));
+    candlesticks->setPenNegative(QColor(0, 0, 0));
+
+    ui.customPlot->rescaleAxes(); //画图
+    ui.customPlot->xAxis->scaleRange(1, Qt::AlignRight); //调整数量,1表示K线的密度,
+    ui.customPlot->setInteraction(QCP::iRangeDrag, true);	 //鼠标拖动	,会出现上下拖动
+    ui.customPlot->axisRect()->setRangeDrag(Qt::Horizontal); //禁用上下拖动
+    */
+
 }
 
 int hy(QString dm)

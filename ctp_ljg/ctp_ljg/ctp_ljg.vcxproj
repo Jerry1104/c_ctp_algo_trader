@@ -50,10 +50,13 @@
     <Link>
       <AdditionalDependencies>thostmduserapi_se.lib;thosttraderapi_se.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(QTDIR)\include\QtANGLE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>Qt5.12.9</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;printsupport;sql;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
@@ -95,6 +98,7 @@
     <ClCompile Include="MdSpi.cpp" />
     <ClCompile Include="MdThread.cpp" />
     <ClCompile Include="Platform.cpp" />
+    <ClCompile Include="qcustomplot.cpp" />
     <ClCompile Include="TdSpi.cpp" />
     <ClCompile Include="TdThread.cpp" />
     <ClCompile Include="tinystr.cpp" />
@@ -118,11 +122,15 @@
     <QtMoc Include="TdThread.h" />
     <ClInclude Include="AsyncLog.h" />
     <ClInclude Include="Platform.h" />
+    <QtMoc Include="qcustomplot.h" />
     <ClInclude Include="tinystr.h" />
     <ClInclude Include="tinyxml.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="config.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ctp_ljg_zh.ts" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
