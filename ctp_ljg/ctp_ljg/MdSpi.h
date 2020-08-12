@@ -29,6 +29,7 @@ public:
 	void Init();
 signals:
 	void sendData(QString);
+	void sendData1(QString);
 private:
 
 

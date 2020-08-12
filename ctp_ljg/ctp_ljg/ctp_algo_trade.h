@@ -29,6 +29,7 @@ private slots:
     void MDLogin();
     void xd();
     void ReceiveHQ(QString);
+    void ReceiveHQ1(QString);
     void ReceiveAutoHQ(QString);
     void ReceiveCJ(QString);
     void ReceiveWT(QString);

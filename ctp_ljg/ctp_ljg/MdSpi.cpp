@@ -125,6 +125,34 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField* pDepthMarketDat
 	QString dt = QString::number(pDepthMarketData->LowerLimitPrice); //跌停价
 	QString openprice = QString::number(pDepthMarketData->OpenPrice);	 //开盘价
 
+
+	QString tradingDay = pDepthMarketData->TradingDay;//交易日
+	QString instrumentID = pDepthMarketData->InstrumentID;   //合约代码
+	QString lastPrice = QString::number(pDepthMarketData->LastPrice);   //最新价
+	QString preSettlementPrice = QString::number(pDepthMarketData->PreSettlementPrice);   //上次结算价
+	QString preClosePrice = QString::number(pDepthMarketData->PreClosePrice);   //昨收盘
+	QString preOpenInterest = QString::number(pDepthMarketData->PreOpenInterest);   //昨持仓量
+	QString openPrice = QString::number(pDepthMarketData->OpenPrice);   //今开盘
+	QString highestPrice = QString::number(pDepthMarketData->HighestPrice);   //最高价
+	QString lowestPrice = QString::number(pDepthMarketData->LowestPrice);   //最低价
+	QString volume = QString::number(pDepthMarketData->Volume);   //成交数量
+	QString openInterest = QString::number(pDepthMarketData->OpenInterest);   //持仓量
+	QString upperLimitPrice = QString::number(pDepthMarketData->UpperLimitPrice);   //涨停板价
+	QString lowerLimitPrice = QString::number(pDepthMarketData->LowerLimitPrice);   //跌停板价
+	QString updateTime1 =pDepthMarketData->UpdateTime;   //最后修改时间
+	QString updateMillisec = QString::number(pDepthMarketData->UpdateMillisec);   //最后修改毫秒
+	QString bidPrice1 = QString::number(pDepthMarketData->BidPrice1);   //申买价一
+	QString bidVolume1 = QString::number(pDepthMarketData->BidVolume1);   //申买量一
+	QString askPrice1 = QString::number(pDepthMarketData->AskPrice1);   //申卖价一
+	QString askVolume1 = QString::number(pDepthMarketData->AskVolume1);   //申卖量一
+
+
+	QString HQTick1 = tradingDay + "," + instrumentID+ "," +lastPrice+ "," +preSettlementPrice+ "," +preClosePrice+ "," +preOpenInterest+ "," +openPrice+
+		"," +highestPrice+ "," +lowestPrice+ "," +volume+ "," +openInterest+ "," +upperLimitPrice+ "," +lowerLimitPrice+ "," +updateTime1+ "," +updateMillisec+
+		"," + bidPrice1+ "," +bidVolume1+ "," +askPrice1+ "," +askVolume1;
+	emit sendData1(HQTick1); 
+
+
 	QString HQTick = dm + "," + updatetime + "," + lastprice + "," + buyprice + "," + buyvol + "," + sellprice + "," + sellvol + "," + zf + "," + vol + "," + zt + "," + dt + "," + openprice;	 //使用信号传递数据
 	emit sendData(HQTick); //只是发送了数据，需要接收端接收数据 ，a,在ctp.h头文件定义接收方法 b, 通过SLOT连接
 }

@@ -30,6 +30,9 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
    // ReadTxt("cu2009.txt");
 
     connect(md->md, SIGNAL(sendData(QString)), this, SLOT(ReceiveHQ(QString)));
+
+    connect(md->md, SIGNAL(sendData1(QString)), this, SLOT(ReceiveHQ1(QString)));
+
     connect(md->md, SIGNAL(sendData(QString)), this, SLOT(ReceiveAutoHQ(QString)));
     
     connect(td->td, SIGNAL(sendCJ(QString)), this, SLOT(ReceiveCJ(QString)));
@@ -356,11 +359,23 @@ void ctp_algo_trade::MDLogin()
 
 }
 
+
+
+//接收行情写入数据到本地用于合成K线
+void ctp_algo_trade::ReceiveHQ1(QString TICK)
+{
+    QStringList  strlist = TICK.split(",");	   //接收StringList数据
+    WriteTxt("TickData/" + strlist.at(1) + ".txt", TICK);  //把接收的行情写到本地
+
+}
+
+
+
 //接收行情
 void ctp_algo_trade::ReceiveHQ(QString TICK)
 {
     QStringList  strlist = TICK.split(",");	   //接收StringList数据
-     WriteTxt("hqTickData/"+strlist.at(0) + ".txt", TICK);  //把接收的行情写到本地
+    // WriteTxt("hqTickData/"+strlist.at(0) + ".txt", TICK);  //把接收的行情写到本地
     if (strlist.at(0) == ui.EditDm->text())
     {
         ui.labelAsk->setText(strlist.at(5));
