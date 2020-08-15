@@ -116,9 +116,4 @@
       <Filter>Header Files</Filter>
     </Xml>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="ctp_ljg_zh.ts">
-      <Filter>Translation Files</Filter>
-    </None>
-  </ItemGroup>
 </Project>

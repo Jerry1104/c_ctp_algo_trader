@@ -30,11 +30,11 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
      //读取指定文件数据
     //ReadTxt("TickData/cu2009.txt");
 
+    connect(md->md, SIGNAL(sendData(QString)), this, SLOT(ReceiveAutoHQ(QString)));
     connect(md->md, SIGNAL(sendData(QString)), this, SLOT(ReceiveHQ(QString)));
-
+    
     connect(md->md, SIGNAL(sendData1(QString)), this, SLOT(ReceiveHQ1(QString)));
 
-    connect(md->md, SIGNAL(sendData(QString)), this, SLOT(ReceiveAutoHQ(QString)));
     
     connect(td->td, SIGNAL(sendCJ(QString)), this, SLOT(ReceiveCJ(QString)));
     connect(td->td, SIGNAL(sendWT(QString)), this, SLOT(ReceiveWT(QString)));
