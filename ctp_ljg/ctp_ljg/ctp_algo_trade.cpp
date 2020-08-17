@@ -16,7 +16,7 @@
 #include <QDebug>
 
 using namespace std;
-extern QString hyarray[2000][4];
+extern QString hyarray[2000][11];
 double ksbl = 0;
 ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     : QMainWindow(parent)
@@ -70,7 +70,7 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     hqaderHQ.append(QString::fromLocal8Bit("跌停价"));
 
     ui.HQTable->setHorizontalHeaderLabels(hqaderHQ);//添加表格
-    ui.HQTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); //自动调整行宽大小
+   // ui.HQTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); //自动调整行宽大小
     ui.HQTable->setSelectionBehavior(QAbstractItemView::SelectRows);//选中行
     ui.HQTable->setEditTriggers(QAbstractItemView::NoEditTriggers); //不可编辑
 
@@ -149,7 +149,7 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
 
 
     /**合约  **/
-    ui.HYTable->setColumnCount(4);
+    ui.HYTable->setColumnCount(11);
 
     QStringList hqaderHY;
     hqaderHY.append(QString::fromLocal8Bit("合约代码"));
@@ -157,11 +157,20 @@ ctp_algo_trade::ctp_algo_trade(QWidget* parent)
     hqaderHY.append(QString::fromLocal8Bit("合约乘数"));
     hqaderHY.append(QString::fromLocal8Bit("合约点数"));
 
+    hqaderHY.append(QString::fromLocal8Bit("交易所代码"));
+    hqaderHY.append(QString::fromLocal8Bit("合约在交易所的代码"));
+    hqaderHY.append(QString::fromLocal8Bit("市价单最大下单量"));
+    hqaderHY.append(QString::fromLocal8Bit("市价单最小下单量"));
+    hqaderHY.append(QString::fromLocal8Bit("限价单最大下单量"));
+    hqaderHY.append(QString::fromLocal8Bit("限价单最小下单量"));
+    hqaderHY.append(QString::fromLocal8Bit("保证金率"));
+
+
     ui.HYTable->setHorizontalHeaderLabels(hqaderHY);
     ui.HYTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui.HYTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.HYTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    
+
     
     //登录信息
     /*ui.MDEdit->setText("tcp://180.168.146.187:10111");
@@ -497,7 +506,7 @@ void ctp_algo_trade::ReceiveHQ(QString TICK)
 int hy(QString dm)
 {
     int hycs;
-    for (int i = 0; i < 500; i++)
+    for (int i = 0; i < 1000; i++)
     {
         if (dm == hyarray[i][0])
         {
@@ -707,13 +716,27 @@ void ctp_algo_trade::ReceiveAutoZJ(QString ZJData)
 void ctp_algo_trade::ReceiveHY(QString HYData)
 {
     QStringList  strlist = HYData.split(",");	   //接收StringList数据
-//循环传入的数据
+
+    WriteTxt("HY_Data/hy.txt", HYData);  //把接收的行情写到本地
+
+
+    //循环传入的数据
     int row = ui.HYTable->rowCount();
     ui.HYTable->insertRow(row);
     ui.HYTable->setItem(row, 0, new QTableWidgetItem(strlist.at(0)));
     ui.HYTable->setItem(row, 1, new QTableWidgetItem(strlist.at(1)));
     ui.HYTable->setItem(row, 2, new QTableWidgetItem(strlist.at(2)));
     ui.HYTable->setItem(row, 3, new QTableWidgetItem(strlist.at(3)));
+    ui.HYTable->setItem(row, 4, new QTableWidgetItem(strlist.at(4)));
+    ui.HYTable->setItem(row, 5, new QTableWidgetItem(strlist.at(5)));
+    ui.HYTable->setItem(row, 6, new QTableWidgetItem(strlist.at(6)));
+    ui.HYTable->setItem(row, 7, new QTableWidgetItem(strlist.at(7)));
+    ui.HYTable->setItem(row, 8, new QTableWidgetItem(strlist.at(8)));
+    ui.HYTable->setItem(row, 9, new QTableWidgetItem(strlist.at(9)));
+    ui.HYTable->setItem(row, 10, new QTableWidgetItem(strlist.at(10)));
+
+
+
 }
 
 //下单按钮下单

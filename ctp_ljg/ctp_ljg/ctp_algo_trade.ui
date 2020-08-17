@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1270</width>
+    <width>1281</width>
     <height>950</height>
    </rect>
   </property>
@@ -20,7 +20,7 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>950</x>
+      <x>960</x>
       <y>0</y>
       <width>311</width>
       <height>251</height>
@@ -259,7 +259,7 @@
    <widget class="QFrame" name="frame_6">
     <property name="geometry">
      <rect>
-      <x>950</x>
+      <x>960</x>
       <y>250</y>
       <width>301</width>
       <height>241</height>
@@ -635,7 +635,7 @@
      <enum>QTabWidget::North</enum>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -771,7 +771,7 @@
    <widget class="QGroupBox" name="groupBox_log">
     <property name="geometry">
      <rect>
-      <x>960</x>
+      <x>970</x>
       <y>490</y>
       <width>311</width>
       <height>351</height>
@@ -993,7 +993,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1270</width>
+     <width>1281</width>
      <height>23</height>
     </rect>
    </property>

@@ -28,7 +28,7 @@ TThostFtdcFrontIDType	FRONT_ID;	//前置编号
 TThostFtdcSessionIDType	SESSION_ID;	//会话编号
 TThostFtdcOrderRefType	ORDER_REF;	//报单引用
 
-QString hyarray[1000][4];   //定义一个合约的二纬数组
+QString hyarray[1000][11];   //定义一个合约的二纬数组
 int k = 0;
 
 
@@ -115,15 +115,35 @@ void TdSpi::ReqQryInstrument()
 void TdSpi::OnRspQryInstrument(CThostFtdcInstrumentField* pInstrument, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (pInstrument == NULL) return;
-	QString dm = pInstrument->InstrumentID; //合约代码
-	QString mc = QString::fromLocal8Bit(pInstrument->InstrumentName); //名称
-	QString cs = QString::number(pInstrument->VolumeMultiple);//合约乘数
-	QString ds = QString::number(pInstrument->PriceTick); //合约点数
+	QString instrumentID = pInstrument->InstrumentID; //合约代码
+	QString instrumentName = QString::fromLocal8Bit(pInstrument->InstrumentName); //名称
+	QString volumeMultiple = QString::number(pInstrument->VolumeMultiple);//合约乘数
+	QString priceTick = QString::number(pInstrument->PriceTick); //合约点数
 
-	hyarray[k][0] = dm;
-	hyarray[k][1] = mc;
-	hyarray[k][2] = cs;
-	hyarray[k][3] = ds;
+
+
+	QString exchangeID = QString::fromLocal8Bit(pInstrument->ExchangeID); //交易所代码
+	QString exchangeInstID = QString::fromLocal8Bit(pInstrument->ExchangeInstID); //合约在交易所的代码
+	QString maxMarketOrderVolume = QString::number(pInstrument->MaxMarketOrderVolume); //市价单最大下单量
+	QString minMarketOrderVolume = QString::number(pInstrument->MinMarketOrderVolume); //市价单最小下单量
+	QString maxLimitOrderVolume = QString::number(pInstrument->MaxLimitOrderVolume); //限价单最大下单量
+	QString minLimitOrderVolume = QString::number(pInstrument->MinLimitOrderVolume); //限价单最小下单量
+	QString longMarginRatio = QString::number(pInstrument->LongMarginRatio); //多头保证金率
+
+
+
+	hyarray[k][0] = instrumentID;
+	hyarray[k][1] = instrumentName;
+	hyarray[k][2] = volumeMultiple;
+	hyarray[k][3] = priceTick;
+
+	hyarray[k][4] = exchangeID;
+	hyarray[k][5] = exchangeInstID;
+	hyarray[k][6] = maxMarketOrderVolume;
+	hyarray[k][7] = minMarketOrderVolume;
+	hyarray[k][8] = maxLimitOrderVolume;
+	hyarray[k][9] = minLimitOrderVolume;
+	hyarray[k][10] = longMarginRatio;
 	k++;
 	if (bIsLast && !IsErrorRspInfo(pRspInfo))
 	{
@@ -132,7 +152,7 @@ void TdSpi::OnRspQryInstrument(CThostFtdcInstrumentField* pInstrument, CThostFtd
 		ReqQryTradingAccount();
 	}
 
-	QString hyData = dm + "," + mc + "," + cs + "," + ds;
+	QString hyData = instrumentID + "," + instrumentName + "," + volumeMultiple + "," + priceTick + "," + exchangeID + "," + exchangeInstID + "," + maxMarketOrderVolume+ "," + minMarketOrderVolume+ "," + maxLimitOrderVolume+ "," + minLimitOrderVolume+ "," +longMarginRatio;
 	emit sendHY(hyData);
 
 
