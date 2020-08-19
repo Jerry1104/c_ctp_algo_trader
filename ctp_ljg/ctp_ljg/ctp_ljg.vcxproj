@@ -98,7 +98,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AsyncLog.cpp" />
     <ClCompile Include="MdSpi.cpp" />
     <ClCompile Include="MdThread.cpp" />
     <ClCompile Include="Platform.cpp" />
@@ -124,7 +123,6 @@
   <ItemGroup>
     <QtMoc Include="MdThread.h" />
     <QtMoc Include="TdThread.h" />
-    <ClInclude Include="AsyncLog.h" />
     <ClInclude Include="Platform.h" />
     <QtMoc Include="qcustomplot.h" />
     <ClInclude Include="tinystr.h" />
